@@ -5,28 +5,18 @@
 #define print_reg_col(label, reg) printf("%-5s %6d\n", label, reg);
 
 void registerdump(struct Z80CPU *cpu) {
-    printf("%-5s %6s\n", "reg", "value");
-    print_reg_col("a", cpu->a);
-    print_reg_col("b", cpu->b);
-    print_reg_col("c", cpu->c);
-    print_reg_col("d", cpu->d);
-    print_reg_col("e", cpu->e);
-    print_reg_col("h", cpu->h);
-    print_reg_col("l", cpu->l);
-    print_reg_col("ap", cpu->ap);
-    print_reg_col("bp", cpu->bp);
-    print_reg_col("cp", cpu->cp);
-    print_reg_col("dp", cpu->dp);
-    print_reg_col("ep", cpu->ep);
-    print_reg_col("hp", cpu->hp);
-    print_reg_col("lp", cpu->lp);
-    print_reg_col("ix", cpu->ix);
-    print_reg_col("iy", cpu->iy);
-    print_reg_col("sp", cpu->sp);
-    print_reg_col("pc", cpu->pc);
-    print_reg_col("i", cpu->i);
-    print_reg_col("r", cpu->r);
-    print_reg_col("stat", cpu->stat);
+    printf("%-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s",
+            "a", "b", "c", "d", "e", "h", "l", "i", "r");
+    printf("\n");
+    printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
+            cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->i, cpu->r);
+    printf("\n");
+    printf("%-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s",
+            "ap", "bp", "cp", "dp", "ep", "hp", "lp", "ix", "iy", "sp", "pc", "stat");
+    printf("\n");
+    printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
+            cpu->ap, cpu->bp, cpu->cp, cpu->dp, cpu->ep, cpu->hp, cpu->lp, cpu->ix, cpu->iy, cpu->sp, cpu->pc, cpu->stat);
+    printf("\n");
 }
 
 struct Z80CPU *newcpu() {

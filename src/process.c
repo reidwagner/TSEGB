@@ -12,8 +12,6 @@ struct Process *newprocess(size_t memsize) {
 }
 
 void memorydump(struct Process *p) {
-    printf("Memory dump:\n");
-
     size_t i;
     size_t last_nonzero_index = 0;
     for (i = 0; i < p->memsize; i++)
@@ -23,12 +21,14 @@ void memorydump(struct Process *p) {
         last_nonzero_index++;  //print one zero after the last non-zero if we can
     for (i = 0; i <= last_nonzero_index; i++)
         printf("%02x ", p->mem[i]);
-
     printf("...\n");
 }
 
 void dump(struct Process *p) {
+    printf("---------\n");
+    printf("Registers\n");
     registerdump(p->cpu);
+    printf("Memory\n");
     memorydump(p);
 }
 
