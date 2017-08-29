@@ -8,4 +8,4 @@ tse: $(SOURCES) $(HEADERS)
 	$(CC) -o $@ $(SOURCES)
 
 clean:
-	rm tse
+	rm -f tse
