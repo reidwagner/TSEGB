@@ -3,29 +3,30 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#define REG_U(hi, lo, full) \
+    union { \
+        struct { \
+            uint8_t hi; \
+            uint8_t lo; \
+        }; \
+        uint16_t full; \
+    };
 
 struct Z80CPU {
-    uint8_t a;
-    uint8_t b;
-    uint8_t c;
-    uint8_t d;
-    uint8_t e;
-    uint8_t h;
-    uint8_t l;
-    uint8_t ap;
-    uint8_t bp;
-    uint8_t cp;
-    uint8_t dp;
-    uint8_t ep;
-    uint8_t hp;
-    uint8_t lp;
+    REG_U(a, f, af)
+    REG_U(b, c, bc)
+    REG_U(d, e, de )
+    REG_U(h, l, hl )
+    REG_U(a_p, f_p, af_p)
+    REG_U(b_p, c_p, bc_p)
+    REG_U(d_p, e_p, de_p)
+    REG_U(h_p, l_p, hl_p)
     uint16_t ix;
     uint16_t iy;
     uint16_t sp; 
     uint16_t pc; 
     uint8_t i; 
     uint8_t r;
-    uint8_t stat;
 };
 
 enum CODES {
