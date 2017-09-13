@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "process.h"
 #include "cpu.h"
 
@@ -8,6 +9,16 @@ struct Process *newprocess(size_t memsize) {
     p->cpu = newcpu();
     p->mem = malloc(memsize*sizeof(uint8_t));
     p->memsize = memsize;
+
+    p->r_table[R_B] = &p->cpu->b;
+    p->r_table[R_C] = &p->cpu->c;
+    p->r_table[R_D] = &p->cpu->d;
+    p->r_table[R_E] = &p->cpu->e;
+    p->r_table[R_H] = &p->cpu->h;
+    p->r_table[R_L] = &p->cpu->l;
+    p->r_table[R_HL] = &p->cpu->hl; // Not correct yet
+    p->r_table[R_A] = &p->cpu->a;
+
     return p;
 }
 
@@ -48,7 +59,7 @@ void loadmemory(struct Process *p, FILE *romfp) {
         fprintf(stderr, "ROM size larger than available memory.");
         exit(1);
     }
-    rewind(romfp);          
+    rewind(romfp);
 
     fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
 }
@@ -56,26 +67,66 @@ void loadmemory(struct Process *p, FILE *romfp) {
 int step(struct Process *p) {
     uint8_t op = nextb(p);
     struct Z80CPU *cpu = p->cpu;
-    switch (op) {
-        case NOP:
+
+    uint8_t op_x = op >> 6;
+    uint8_t op_y = (op >> 3) % 8;
+    uint8_t op_z = op % 8;
+    uint8_t op_p = op_y >> 1;
+    uint8_t op_q = op_y % 2;
+
+    if (verbose)
+        printf("Opcode: %02x x: %d y: %d z: %d p %d q %d\n", op, op_x, op_y, op_z, op_p, op_q);
+
+    switch (op_x) {
+        case 0:
+            switch (op_z) {
+                case 0:
+                    switch (op_y) {
+                        default:
+                        goto unknown_op;
+                    }
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                    *(p->r_table[op_y]) = nextb(p);
+                    break;
+                case 7:
+                default:
+                    goto unknown_op;
+            }
             break;
-        case LD_A_n:
-            cpu->a = nextb(p);
+        case 1:
+            if (op_z == 6 && op_y == 6) {
+                if (verbose)
+                    printf("HALT\n");
+                return -1;
+            } else {
+                ;
+            }
+        case 2:
+        case 3:
+            switch (op_z) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                default:
+                    goto unknown_op;
+            }
             break;
-        case LD_B_n:
-            cpu->b = nextb(p);
-            break;
-        case ADD_A_B:
-            cpu->a += cpu->b;
-            break;
-        case LD_nloc_A:
-            p->mem[(size_t) nexttwob(p)] = cpu->a;
-            break;
-        case HALT:
-            printf("HALT\n");
-            return -1;
         default:
-            printf("Undefined code\n");
+            goto unknown_op;
     }
+    return 0;
+unknown_op:
+    fprintf(stderr, "Unknown opcode: %02x\n", op);
     return 0;
 }
