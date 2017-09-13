@@ -5,7 +5,7 @@
 #include "cpu.h"
 #include "process.h"
 
-#define DEFAULTMEM 1000
+static int rom_size_max = 1000;
 
 bool verbose = false;
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         }
     }
     char *romfilename = argv[optind];
-    struct Process *p = newprocess(DEFAULTMEM);
+    struct Process *p = newprocess(rom_size_max);
     if (verbose)
         dump(p);
     FILE *romfp = fopen(romfilename, "r");
