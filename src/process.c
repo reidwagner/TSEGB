@@ -115,6 +115,7 @@ int step(struct Process *p) {
             }
         case 2:
             p->alu_table[op_y](p->cpu, *(p->r_table[op_z]));
+            break;
         case 3:
             switch (op_z) {
                 case 0:
