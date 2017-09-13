@@ -7,23 +7,27 @@
 #include <stdbool.h>
 #include "cpu.h"
 
-#define R_B 0
-#define R_C 1
-#define R_D 2
-#define R_E 3
-#define R_H 4
-#define R_L 5
-#define R_HL 6
-#define R_A 7
+enum {
+    R_B,
+    R_C,
+    R_D,
+    R_E,
+    R_H,
+    R_L,
+    R_HL,
+    R_A
+};
 
-#define ALU_ADD 0
-#define ALU_ACD 1
-#define ALU_SUB 2
-#define ALU_SBC 3
-#define ALU_AND 4
-#define ALU_XOR 5
-#define ALU_OR 6
-#define ALU_CP 7
+enum {
+    ALU_ADD,
+    ALU_ACD,
+    ALU_SUB,
+    ALU_SBC,
+    ALU_AND,
+    ALU_XOR,
+    ALU_OR,
+    ALU_CP
+};
 
 struct Process {
     struct Z80CPU *cpu;
