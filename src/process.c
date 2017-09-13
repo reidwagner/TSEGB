@@ -19,6 +19,8 @@ struct Process *newprocess(size_t memsize) {
     p->r_table[R_HL] = &p->cpu->hl; // Not correct yet
     p->r_table[R_A] = &p->cpu->a;
 
+    p->alu_table[ALU_ADD] = &add_A_n;
+
     return p;
 }
 
@@ -62,6 +64,10 @@ void loadmemory(struct Process *p, FILE *romfp) {
     rewind(romfp);
 
     fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
+}
+
+void add_A_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a += n;
 }
 
 int step(struct Process *p) {
@@ -108,6 +114,7 @@ int step(struct Process *p) {
                 ;
             }
         case 2:
+            p->alu_table[op_y](p->cpu, *(p->r_table[op_z]));
         case 3:
             switch (op_z) {
                 case 0:
