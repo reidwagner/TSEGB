@@ -1,13 +1,11 @@
 # TSE Z80 Emulator
 
-Restarting in C a Z80 project I began last year in Rust. Want to focus more on the emulator than on a new language. Just begun this weekend so it runs only one program, found in assembly/.
+Restarting in C a Z80 project I began last year in Rust. Want to focus more on the emulator than on a new language.
 
-Implemented instructions are: 
+Implemented instructions, with r being any 8-bit register:
 - NOP
-- ADD A, B
-- LD A, n
-- LD B, n
-- LD (HL), a
+- ADD A, r
+- LD r, n
 - HALT
 
 Resources:
