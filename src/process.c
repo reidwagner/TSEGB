@@ -19,7 +19,14 @@ struct Process *newprocess(size_t memsize) {
     p->r_table[R_HL] = &p->cpu->hl; // Not correct yet
     p->r_table[R_A] = &p->cpu->a;
 
-    p->alu_table[ALU_ADD] = &add_A_n;
+    p->alu_table[ALU_ADD] = &add_n;
+    p->alu_table[ALU_ADC] = &adc_n;
+    p->alu_table[ALU_SUB] = &sub_n;
+    p->alu_table[ALU_SBC] = &sbc_n;
+    p->alu_table[ALU_AND] = &and_n;
+    p->alu_table[ALU_XOR] = &xor_n;
+    p->alu_table[ALU_OR] = &or_n;
+    p->alu_table[ALU_CP] = &cp_n;
 
     return p;
 }
@@ -55,6 +62,10 @@ uint16_t nexttwob(struct Process *p) {
     return (hi << 8) + lo;
 }
 
+uint8_t carry(struct Z80CPU *cpu) {
+    return cpu->f & 1;
+}
+
 void loadmemory(struct Process *p, FILE *romfp) {
     fseek(romfp, 0, SEEK_END);
     if (p->memsize < ftell(romfp)) {
@@ -66,8 +77,36 @@ void loadmemory(struct Process *p, FILE *romfp) {
     fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
 }
 
-void add_A_n(struct Z80CPU *cpu, uint8_t n) {
+void add_n(struct Z80CPU *cpu, uint8_t n) {
     cpu->a += n;
+}
+
+void adc_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a += (n + carry(cpu));
+}
+
+void sub_n(struct Z80CPU *cpu, uint8_t n) {
+    ; //TODO
+}
+
+void sbc_n(struct Z80CPU *cpu, uint8_t n) {
+    ; //TODO
+}
+
+void and_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a &= n;
+}
+
+void xor_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a ^= n;
+}
+
+void or_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a |= n;
+}
+
+void cp_n(struct Z80CPU *cpu, uint8_t n) {
+    ; //TODO
 }
 
 int step(struct Process *p) {
