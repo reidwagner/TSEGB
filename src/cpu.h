@@ -29,15 +29,6 @@ struct Z80CPU {
     uint8_t r;
 };
 
-enum CODES {
-    NOP = 0x00,
-    LD_A_n = 0x3e,
-    LD_B_n = 0x06,
-    ADD_A_B = 0x80,
-    LD_nloc_A = 0x32,
-    HALT = 0x76
-};
-
 void registerdump(struct Z80CPU *cpu);
 
 struct Z80CPU *newcpu();
