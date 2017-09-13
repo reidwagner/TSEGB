@@ -5,6 +5,10 @@ Restarting in C a Z80 project I began last year in Rust. Want to focus more on t
 Implemented instructions, with r being any 8-bit register:
 - NOP
 - ADD A, r
+- ADC A, r
+- AND A, r
+- XOR A, r
+- OR A, r
 - LD r, n
 - HALT
 
