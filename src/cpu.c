@@ -17,6 +17,12 @@ void registerdump(struct Z80CPU *cpu) {
     printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
             cpu->a_p, cpu->b_p, cpu->c_p, cpu->d_p, cpu->e_p, cpu->h_p, cpu->l_p, cpu->ix, cpu->iy, cpu->sp, cpu->pc);
     printf("\n");
+    printf("%-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s",
+            "S", "Z", "F5", "H", "F3", "PV", "N", "C");
+    printf("\n");
+    printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
+            cpu->f_S, cpu->f_Z, cpu->f_F5, cpu->f_H, cpu->f_F3, cpu->f_PV, cpu->f_N, cpu->f_C);
+    printf("\n");
 }
 
 struct Z80CPU *newcpu() {
