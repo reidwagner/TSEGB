@@ -48,5 +48,8 @@ struct Z80CPU *newcpu() {
     cpu->pc = 0; 
     cpu->i = 0; 
     cpu->r = 0;
+
+    cpu->f_Z = 1;
+
     return cpu;
 }

@@ -19,6 +19,9 @@ struct Process *newprocess(size_t memsize) {
     p->r_table[R_HL] = &p->cpu->hl; // Not correct yet
     p->r_table[R_A] = &p->cpu->a;
 
+    p->cc_table[CC_Z] = &check_condition_z;
+    p->cc_table[CC_NZ] = &check_condition_nz;
+
     p->alu_table[ALU_ADD] = &add_n;
     p->alu_table[ALU_ADC] = &adc_n;
     p->alu_table[ALU_SUB] = &sub_n;
@@ -77,6 +80,21 @@ void loadmemory(struct Process *p, FILE *romfp) {
     fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
 }
 
+void set_zero_flag(struct Z80CPU *cpu) {
+    if (cpu->a == 0)
+        cpu->f_Z = 1;
+    else
+        cpu->f_Z = 0;
+}
+
+uint8_t check_condition_z(struct Z80CPU *cpu) {
+    return cpu->f_Z;
+}
+
+uint8_t check_condition_nz(struct Z80CPU *cpu) {
+    return cpu->f_Z ^ 1;
+}
+
 void add_n(struct Z80CPU *cpu, uint8_t n) {
     cpu->a += n;
 }
@@ -86,7 +104,8 @@ void adc_n(struct Z80CPU *cpu, uint8_t n) {
 }
 
 void sub_n(struct Z80CPU *cpu, uint8_t n) {
-    ; //TODO
+    cpu->a -= n;
+    set_zero_flag(cpu);
 }
 
 void sbc_n(struct Z80CPU *cpu, uint8_t n) {
@@ -118,6 +137,8 @@ int step(struct Process *p) {
     uint8_t op_z = op % 8;
     uint8_t op_p = op_y >> 1;
     uint8_t op_q = op_y % 2;
+
+    uint8_t cc;
 
     if (verbose)
         printf("Opcode: %02x x: %d y: %d z: %d p %d q %d\n", op, op_x, op_y, op_z, op_p, op_q);
@@ -160,6 +181,10 @@ int step(struct Process *p) {
                 case 0:
                 case 1:
                 case 2:
+                    uint8_t cc = p->cc_table[op_y](p->cpu);
+                    if (cc)
+                        p->cpu->pc = nexttwob(p);
+                    break;
                 case 3:
                 case 4:
                 case 5:
@@ -172,6 +197,7 @@ int step(struct Process *p) {
         default:
             goto unknown_op;
     }
+    set_zero_flag(cpu);
     return 0;
 unknown_op:
     fprintf(stderr, "Unknown opcode: %02x\n", op);
