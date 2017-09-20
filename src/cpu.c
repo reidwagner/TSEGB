@@ -53,3 +53,55 @@ struct Z80CPU *newcpu() {
 
     return cpu;
 }
+
+uint8_t carry(struct Z80CPU *cpu) {
+    return cpu->f & 1;
+}
+
+void set_zero_flag(struct Z80CPU *cpu) {
+    if (cpu->a == 0)
+        cpu->f_Z = 1;
+    else
+        cpu->f_Z = 0;
+}
+
+uint8_t check_condition_z(struct Z80CPU *cpu) {
+    return cpu->f_Z;
+}
+
+uint8_t check_condition_nz(struct Z80CPU *cpu) {
+    return cpu->f_Z ^ 1;
+}
+
+void add_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a += n;
+}
+
+void adc_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a += (n + carry(cpu));
+}
+
+void sub_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a -= n;
+    set_zero_flag(cpu);
+}
+
+void sbc_n(struct Z80CPU *cpu, uint8_t n) {
+    ; //TODO
+}
+
+void and_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a &= n;
+}
+
+void xor_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a ^= n;
+}
+
+void or_n(struct Z80CPU *cpu, uint8_t n) {
+    cpu->a |= n;
+}
+
+void cp_n(struct Z80CPU *cpu, uint8_t n) {
+    ; //TODO
+}

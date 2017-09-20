@@ -54,17 +54,6 @@ void memorydump(struct Process *p);
 void dump(struct Process *p);
 void loadmemory(struct Process *p, FILE *romfile);
 int step(struct Process *p);
-uint8_t check_condition_z(struct Z80CPU *cpu);
-uint8_t check_condition_nz(struct Z80CPU *cpu);
-
-void add_n(struct Z80CPU *cpu, uint8_t a);
-void adc_n(struct Z80CPU *cpu, uint8_t a);
-void sub_n(struct Z80CPU *cpu, uint8_t a);
-void sbc_n(struct Z80CPU *cpu, uint8_t a);
-void and_n(struct Z80CPU *cpu, uint8_t a);
-void xor_n(struct Z80CPU *cpu, uint8_t a);
-void or_n(struct Z80CPU *cpu, uint8_t a);
-void cp_n(struct Z80CPU *cpu, uint8_t a);
 
 extern bool verbose;
 

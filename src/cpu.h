@@ -54,4 +54,16 @@ void registerdump(struct Z80CPU *cpu);
 
 struct Z80CPU *newcpu();
 
+void add_n(struct Z80CPU *cpu, uint8_t a);
+void adc_n(struct Z80CPU *cpu, uint8_t a);
+void sub_n(struct Z80CPU *cpu, uint8_t a);
+void sbc_n(struct Z80CPU *cpu, uint8_t a);
+void and_n(struct Z80CPU *cpu, uint8_t a);
+void xor_n(struct Z80CPU *cpu, uint8_t a);
+void or_n(struct Z80CPU *cpu, uint8_t a);
+void cp_n(struct Z80CPU *cpu, uint8_t a);
+void set_zero_flag(struct Z80CPU *cpu);
+uint8_t check_condition_z(struct Z80CPU *cpu);
+uint8_t check_condition_nz(struct Z80CPU *cpu);
+
 #endif
