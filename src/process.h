@@ -44,6 +44,8 @@ struct Process {
     struct Z80CPU *cpu;
     uint8_t *mem;
     size_t memsize;
+    int iterations;
+    int max_iterations;
     uint8_t *r_table[8];
     uint8_t (*cc_table[8]) (struct Z80CPU*);
     void (*alu_table[8]) (struct Z80CPU*, uint8_t);
@@ -56,5 +58,8 @@ void loadmemory(struct Process *p, FILE *romfile);
 int step(struct Process *p);
 
 extern bool verbose;
+
+#define DEFAULT_MAX_MEMSIZE 1000
+#define DEFAULT_MAX_ITERATIONS 10000
 
 #endif

@@ -5,8 +5,6 @@
 #include "cpu.h"
 #include "process.h"
 
-static int rom_size_max = 1000;
-
 bool verbose = false;
 
 void run(struct Process *p) {
@@ -17,19 +15,25 @@ void run(struct Process *p) {
 
 int main(int argc, char *argv[]) {
     int opt;
+    int max_iterations = 0;
     if (argc < 2)
         goto usage_error;
-    while ((opt = getopt(argc, argv, "v")) != -1) {
+    while ((opt = getopt(argc, argv, "vi:")) != -1) {
         switch (opt) {
             case 'v': 
                 verbose = true; 
+                break;
+            case 'i':
+                max_iterations = atoi(optarg);
                 break;
             default:
                 goto usage_error;
         }
     }
     char *romfilename = argv[optind];
-    struct Process *p = newprocess(rom_size_max);
+    struct Process *p = newprocess(DEFAULT_MAX_MEMSIZE);
+    if (max_iterations)
+        p->max_iterations = max_iterations;
     if (verbose)
         dump(p);
     FILE *romfp = fopen(romfilename, "r");

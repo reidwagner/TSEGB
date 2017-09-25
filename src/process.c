@@ -9,6 +9,8 @@ struct Process *newprocess(size_t memsize) {
     p->cpu = newcpu();
     p->mem = malloc(memsize*sizeof(uint8_t));
     p->memsize = memsize;
+    p->max_iterations = DEFAULT_MAX_ITERATIONS;
+    p->iterations = 0;
 
     p->r_table[R_B] = &p->cpu->b;
     p->r_table[R_C] = &p->cpu->c;
@@ -77,6 +79,10 @@ void loadmemory(struct Process *p, FILE *romfp) {
 }
 
 int step(struct Process *p) {
+
+    if (p->iterations++ >= p->max_iterations)
+        return -1;
+
     uint8_t op = nextb(p);
     struct Z80CPU *cpu = p->cpu;
 
@@ -148,7 +154,6 @@ int step(struct Process *p) {
                         case 5:
                         case 6:
                         case 7:
-                        default:
                             goto unknown_op;
                     }
                 case 4:
