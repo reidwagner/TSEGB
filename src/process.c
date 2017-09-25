@@ -106,7 +106,10 @@ int step(struct Process *p) {
                 case 4:
                 case 5:
                 case 6:
-                    *(p->r_table[op_y]) = nextb(p);
+                    if (op_y == 6)
+                        *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
+                    else
+                        *(p->r_table[op_y]) = nextb(p);
                     break;
                 case 7:
                 default:
