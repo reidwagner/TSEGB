@@ -137,6 +137,20 @@ int step(struct Process *p) {
                         p->cpu->pc = nexttwob(p);
                     break;
                 case 3:
+                    switch (op_y) {
+                        case 0:
+                            p->cpu->pc = nexttwob(p);
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        default:
+                            goto unknown_op;
+                    }
                 case 4:
                 case 5:
                 case 6:
