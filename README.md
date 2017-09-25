@@ -10,6 +10,7 @@ Implemented instructions. Values found in [disassembly tables](http://www.z80.in
 - XOR A, r
 - OR A, r
 - LD r, n
+- LD (HL), n
 - JP cc, n
 - HALT
 
