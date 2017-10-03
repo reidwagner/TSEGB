@@ -127,6 +127,17 @@ void test_jz() {
     free(p);
 }
 
+void test_jp() {
+    struct Process *p = create_process("assembly/JZ.bin");
+
+    step(p);
+    TEST_ASSERT_EQUAL_INT(5, p->cpu->a);
+    stepn(p, 10);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+
+    free(p);
+}
+
 int main(void) {
     UnityBegin("test/test.c");
 
@@ -136,6 +147,7 @@ int main(void) {
     RUN_TEST(test_or);
     RUN_TEST(test_xor);
     RUN_TEST(test_jz);
+    RUN_TEST(test_jp);
 
     UnityEnd();
     return 0;
