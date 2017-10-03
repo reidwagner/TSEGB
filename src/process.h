@@ -52,6 +52,7 @@ struct Process {
 };
 
 struct Process *newprocess(size_t memsize);
+void run(struct Process *p);
 void memorydump(struct Process *p);
 void dump(struct Process *p);
 void loadmemory(struct Process *p, FILE *romfile);

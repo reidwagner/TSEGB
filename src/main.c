@@ -7,12 +7,6 @@
 
 bool verbose = false;
 
-void run(struct Process *p) {
-    while (step(p) != -1)
-        if (verbose)
-            dump(p);
-}
-
 int main(int argc, char *argv[]) {
     int opt;
     int max_iterations = 0;

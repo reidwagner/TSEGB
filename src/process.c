@@ -36,6 +36,13 @@ struct Process *newprocess(size_t memsize) {
     return p;
 }
 
+void run(struct Process *p) {
+    while (step(p) != -1)
+        if (verbose)
+            dump(p);
+}
+
+
 void memorydump(struct Process *p) {
     size_t i;
     size_t last_nonzero_index = 0;
