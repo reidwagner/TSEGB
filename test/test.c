@@ -46,8 +46,7 @@ void test_and() {
     /*
       1 & 1 -> 1
     */
-    for (i = 0; i < 3; i++)
-        step(p);
+    stepn(p, 3);
     TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
 
     /*
@@ -56,8 +55,7 @@ void test_and() {
       0 & 0 -> 0
     */
     for (j = 0; j < 3; j++) {
-        for (i = 0; i < 2; i++)
-            step(p);
+        stepn(p, 2);
         TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
     }
 
@@ -71,8 +69,7 @@ void test_or() {
     /*
       0 | 0 -> 0
     */
-    for (i = 0; i < 3; i++)
-        step(p);
+    stepn(p, 3);
     TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
 
     /*
@@ -81,8 +78,7 @@ void test_or() {
       1 | 1 -> 1
     */
     for (j = 0; j < 3; j++) {
-        for (i = 0; i < 2; i++)
-            step(p);
+        stepn(p, 2);
         TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
     }
 
@@ -96,29 +92,25 @@ void test_xor() {
     /*
       1 ^ 1 -> 0
     */
-    for (i = 0; i < 3; i++)
-        step(p);
+    stepn(p, 3);
     TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
 
     /*
       0 | 0 -> 0
     */
-    for (i = 0; i < 2; i++)
-        step(p);
+    stepn(p, 2);
     TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
 
     /*
       0 | 1 -> 1
     */
-    for (i = 0; i < 2; i++)
-        step(p);
+    stepn(p, 2);
     TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
 
     /*
       1 | 0 -> 1
     */
-    for (i = 0; i < 2; i++)
-        step(p);
+    stepn(p, 2);
     TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
 
     free(p);

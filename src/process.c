@@ -87,6 +87,15 @@ void loadmemory(struct Process *p, FILE *romfp) {
     fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
 }
 
+int stepn(struct Process *p, int n) {
+    int i, rc;
+    for (i = 0; i < n; i++) {
+        if ((rc = step(p)) != 0)
+            return rc;
+    }
+    return 0;
+}
+
 int step(struct Process *p) {
 
     if (p->iterations++ >= p->max_iterations)

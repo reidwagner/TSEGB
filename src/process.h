@@ -57,6 +57,7 @@ void memorydump(struct Process *p);
 void dump(struct Process *p);
 void loadmemory(struct Process *p, FILE *romfile);
 int step(struct Process *p);
+int stepn(struct Process *p, int n);
 
 extern bool verbose;
 
