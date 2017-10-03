@@ -15,6 +15,6 @@
 
     ld b,0
     xor b
-    ;; a is 0
+    ;; a is 1
 
     halt

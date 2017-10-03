@@ -5,8 +5,6 @@
 #include "cpu.h"
 #include "process.h"
 
-bool verbose = false;
-
 int main(int argc, char *argv[]) {
     int opt;
     int max_iterations = 0;

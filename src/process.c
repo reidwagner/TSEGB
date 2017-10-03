@@ -4,6 +4,8 @@
 #include "process.h"
 #include "cpu.h"
 
+bool verbose = false;
+
 struct Process *newprocess(size_t memsize) {
     struct Process *p = malloc(sizeof(struct Process));
     p->cpu = newcpu();
