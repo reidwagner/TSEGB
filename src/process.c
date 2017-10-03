@@ -20,7 +20,7 @@ struct Process *newprocess(size_t memsize) {
     p->r_table[R_E] = &p->cpu->e;
     p->r_table[R_H] = &p->cpu->h;
     p->r_table[R_L] = &p->cpu->l;
-    p->r_table[R_HL] = &p->cpu->hl; // Not correct yet
+    p->r_table[R_HL] = NULL; // Best way to handle? Nothing goes here.
     p->r_table[R_A] = &p->cpu->a;
 
     p->cc_table[CC_Z] = &check_condition_z;
