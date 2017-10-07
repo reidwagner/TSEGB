@@ -65,6 +65,10 @@ void dump(struct Process *p) {
     printf("Memory\n");
     memorydump(p);
 }
+/* Think about making these inlines or macros. */
+uint8_t currb(struct Process *p) {
+    return p->mem[p->cpu->pc];
+}
 
 uint8_t nextb(struct Process *p) {
     return p->mem[p->cpu->pc++];
@@ -75,6 +79,11 @@ uint16_t nexttwob(struct Process *p) {
     uint8_t hi = nextb(p);
     return (hi << 8) + lo;
 }
+
+void report_unknown(struct Process *p) {
+    fprintf(stderr, "Unknown opcode: %02x\n", currb(p));
+}
+
 
 void loadmemory(struct Process *p, FILE *romfp) {
     fseek(romfp, 0, SEEK_END);
@@ -96,6 +105,50 @@ int stepn(struct Process *p, int n) {
     return 0;
 }
 
+/* Also contains some assorted other ops, like NOP */
+void relative_jump(struct Process *p, uint8_t op_y) {
+    switch (op_y) {
+    case 0:
+        break;
+    default:
+        report_unknown(p);
+    }
+}
+
+void byte_load_immediate(struct Process *p, uint8_t op_y) {
+    if (op_y == 6)
+        *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
+    else
+        *(p->r_table[op_y]) = nextb(p);
+}
+
+void alu_r_operation(struct Process *p, uint8_t op_y, uint8_t op_z) {
+    p->alu_table[op_y](p->cpu, *(p->r_table[op_z]));
+}
+
+void conditional_jump(struct Process *p, uint8_t op_y) {
+    uint8_t cc = p->cc_table[op_y](p->cpu);
+    if (cc)
+        p->cpu->pc = nexttwob(p);
+}
+
+/* Needs better name */
+void misc_operation(struct Process *p, uint8_t op_y) {
+    switch (op_y) {
+    case 0:
+        p->cpu->pc = nexttwob(p);
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        report_unknown(p);
+    }
+} 
+
 int step(struct Process *p) {
 
     if (p->iterations++ >= p->max_iterations)
@@ -110,8 +163,6 @@ int step(struct Process *p) {
     uint8_t op_p = op_y >> 1;
     uint8_t op_q = op_y % 2;
 
-    uint8_t cc;
-
     if (verbose)
         printf("Opcode: %02x x: %d y: %d z: %d p %d q %d\n", op, op_x, op_y, op_z, op_p, op_q);
 
@@ -119,10 +170,7 @@ int step(struct Process *p) {
         case 0:
             switch (op_z) {
                 case 0:
-                    switch (op_y) {
-                        default:
-                        goto unknown_op;
-                    }
+                    relative_jump(p, op_y);
                     break;
                 case 1:
                 case 2:
@@ -130,14 +178,11 @@ int step(struct Process *p) {
                 case 4:
                 case 5:
                 case 6:
-                    if (op_y == 6)
-                        *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
-                    else
-                        *(p->r_table[op_y]) = nextb(p);
+                    byte_load_immediate(p, op_y);
                     break;
                 case 7:
                 default:
-                    goto unknown_op;
+                    report_unknown(p);
             }
             break;
         case 1:
@@ -146,48 +191,31 @@ int step(struct Process *p) {
                     printf("HALT\n");
                 return -1;
             } else {
-                ;
+                ; //8-bit loading
             }
         case 2:
-            p->alu_table[op_y](p->cpu, *(p->r_table[op_z]));
+            alu_r_operation(p, op_y, op_z);
             break;
         case 3:
             switch (op_z) {
                 case 0:
                 case 1:
                 case 2:
-                    cc = p->cc_table[op_y](p->cpu);
-                    if (cc)
-                        p->cpu->pc = nexttwob(p);
+                    conditional_jump(p, op_y);
                     break;
                 case 3:
-                    switch (op_y) {
-                        case 0:
-                            p->cpu->pc = nexttwob(p);
-                            break;
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                            goto unknown_op;
-                    }
+                    misc_operation(p, op_y);
+                    break;
                 case 4:
                 case 5:
                 case 6:
                 case 7:
                 default:
-                    goto unknown_op;
+                    report_unknown(p);
             }
             break;
         default:
-            goto unknown_op;
+            report_unknown(p);
     }
     set_zero_flag(cpu);
     return 0;
-unknown_op:
-    fprintf(stderr, "Unknown opcode: %02x\n", op);
-    return 0;
-}
