@@ -102,7 +102,7 @@ void report_unknown(struct Process *p) {
 }
 
 
-/*---- Functions for groups of operations defined by x and y ---*/
+/*---- Functions for groups of operations defined by x and z ---*/
 /*--------------------------------------------------------------*/
 
 void relative_jump(struct Process *p, uint8_t op_y) {
@@ -230,7 +230,6 @@ int stepn(struct Process *p, int n) {
 /*--------------------------------------------------------------*/
 
 int step(struct Process *p) {
-
     if (p->iterations++ >= p->max_iterations)
         return -1;
 
@@ -282,7 +281,7 @@ int step(struct Process *p) {
                 halt(p);
                 return -1;
             } else {
-                byte_load(p, op_y, op_z); //8-bit loading
+                byte_load(p, op_y, op_z);
                 break;
             }
         case 2:
