@@ -6,6 +6,10 @@
 
 bool verbose = false;
 
+
+/*----                  Setup functions                      ---*/
+/*--------------------------------------------------------------*/
+
 struct Process *newprocess(size_t memsize) {
     struct Process *p = malloc(sizeof(struct Process));
     p->cpu = newcpu();
@@ -38,12 +42,20 @@ struct Process *newprocess(size_t memsize) {
     return p;
 }
 
-void run(struct Process *p) {
-    while (step(p) != -1)
-        if (verbose)
-            dump(p);
+void loadmemory(struct Process *p, FILE *romfp) {
+    fseek(romfp, 0, SEEK_END);
+    if (p->memsize < ftell(romfp)) {
+        fprintf(stderr, "ROM size larger than available memory.");
+        exit(1);
+    }
+    rewind(romfp);
+
+    fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
 }
 
+
+/*----                  Debug functions                      ---*/
+/*--------------------------------------------------------------*/
 
 void memorydump(struct Process *p) {
     size_t i;
@@ -65,6 +77,11 @@ void dump(struct Process *p) {
     printf("Memory\n");
     memorydump(p);
 }
+
+
+/*----                  Helper functions                      ---*/
+/*--------------------------------------------------------------*/
+
 /* Think about making these inlines or macros. */
 uint8_t currb(struct Process *p) {
     return p->mem[p->cpu->pc];
@@ -85,27 +102,9 @@ void report_unknown(struct Process *p) {
 }
 
 
-void loadmemory(struct Process *p, FILE *romfp) {
-    fseek(romfp, 0, SEEK_END);
-    if (p->memsize < ftell(romfp)) {
-        fprintf(stderr, "ROM size larger than available memory.");
-        exit(1);
-    }
-    rewind(romfp);
+/*---- Functions for groups of operations defined by x and y ---*/
+/*--------------------------------------------------------------*/
 
-    fread(p->mem, sizeof(uint8_t), p->memsize, romfp);
-}
-
-int stepn(struct Process *p, int n) {
-    int i, rc;
-    for (i = 0; i < n; i++) {
-        if ((rc = step(p)) != 0)
-            return rc;
-    }
-    return 0;
-}
-
-/* Also contains some assorted other ops, like NOP */
 void relative_jump(struct Process *p, uint8_t op_y) {
     switch (op_y) {
     case 0:
@@ -195,6 +194,7 @@ void misc_op_3(struct Process *p, uint8_t op_q, uint8_t op_p) {
 
 void alu_immediate(struct Process *p, uint8_t op_y) {
     report_unknown(p);
+
 }
 
 void restart (struct Process *p, uint8_t op_y) {
@@ -205,6 +205,29 @@ void halt(struct Process *p) {
     if (verbose)
         printf("HALT\n");
 }
+
+
+/*----                      Execution                        ---*/
+/*--------------------------------------------------------------*/
+
+void run(struct Process *p) {
+    while (step(p) != -1)
+        if (verbose)
+            dump(p);
+}
+
+int stepn(struct Process *p, int n) {
+    int i, rc;
+    for (i = 0; i < n; i++) {
+        if ((rc = step(p)) != 0)
+            return rc;
+    }
+    return 0;
+}
+
+
+/*----              Execute single instruction                --*/
+/*--------------------------------------------------------------*/
 
 int step(struct Process *p) {
 
