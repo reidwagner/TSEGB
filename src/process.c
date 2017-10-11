@@ -84,7 +84,7 @@ void dump(struct Process *p) {
 
 /* Think about making these inlines or macros. */
 uint8_t currb(struct Process *p) {
-    return p->mem[p->cpu->pc];
+    return p->mem[p->cpu->pc - 1];
 }
 
 uint8_t nextb(struct Process *p) {
