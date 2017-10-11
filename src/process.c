@@ -115,7 +115,35 @@ void relative_jump(struct Process *p, uint8_t op_y) {
     }
 }
 
-void byte_load_immediate(struct Process *p, uint8_t op_y) {
+void two_byte_load_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    report_unknown(p);
+}
+
+void indirect_load(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    report_unknown(p);
+}
+
+void two_byte_inc_dec(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    report_unknown(p);
+}
+
+void byte_inc(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void byte_dec(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void accumulator_op(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void byte_load(struct Process *p, uint8_t op_y, uint8_t op_z) {
+    report_unknown(p);
+}
+
+void byte_load_imm(struct Process *p, uint8_t op_y) {
     if (op_y == 6)
         *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
     else
@@ -132,8 +160,20 @@ void conditional_jump(struct Process *p, uint8_t op_y) {
         p->cpu->pc = nexttwob(p);
 }
 
+void conditional_return(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void conditional_call(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void misc_op(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    report_unknown(p);
+}
+
 /* Needs better name */
-void misc_operation(struct Process *p, uint8_t op_y) {
+void misc_op_2(struct Process *p, uint8_t op_y) {
     switch (op_y) {
     case 0:
         p->cpu->pc = nexttwob(p);
@@ -147,7 +187,24 @@ void misc_operation(struct Process *p, uint8_t op_y) {
     case 7:
         report_unknown(p);
     }
-} 
+}
+
+void misc_op_3(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    report_unknown(p);
+}
+
+void alu_immediate(struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void restart (struct Process *p, uint8_t op_y) {
+    report_unknown(p);
+}
+
+void halt(struct Process *p) {
+    if (verbose)
+        printf("HALT\n");
+}
 
 int step(struct Process *p) {
 
@@ -173,25 +230,37 @@ int step(struct Process *p) {
                     relative_jump(p, op_y);
                     break;
                 case 1:
+                    two_byte_load_imm_add(p, op_q, op_p);
+                    break;
                 case 2:
+                    indirect_load(p, op_q, op_p);
+                    break;
                 case 3:
+                    two_byte_inc_dec(p, op_q, op_p);
+                    break;
                 case 4:
+                    byte_inc(p, op_y);
+                    break;
                 case 5:
+                    byte_dec(p, op_y);
+                    break;
                 case 6:
-                    byte_load_immediate(p, op_y);
+                    byte_load_imm(p, op_y);
                     break;
                 case 7:
+                    accumulator_op(p, op_y);
+                    break;
                 default:
                     report_unknown(p);
             }
             break;
         case 1:
             if (op_z == 6 && op_y == 6) {
-                if (verbose)
-                    printf("HALT\n");
+                halt(p);
                 return -1;
             } else {
-                ; //8-bit loading
+                byte_load(p, op_y, op_z); //8-bit loading
+                break;
             }
         case 2:
             alu_r_operation(p, op_y, op_z);
@@ -199,17 +268,29 @@ int step(struct Process *p) {
         case 3:
             switch (op_z) {
                 case 0:
+                    conditional_return(p, op_y);
+                    break;
                 case 1:
+                    misc_op(p, op_q, op_p);
+                    break;
                 case 2:
                     conditional_jump(p, op_y);
                     break;
                 case 3:
-                    misc_operation(p, op_y);
+                    misc_op_2(p, op_y);
                     break;
                 case 4:
+                    conditional_call(p, op_y);
+                    break;
                 case 5:
+                    misc_op_3(p, op_q, op_p);
+                    break;
                 case 6:
+                    alu_immediate(p, op_y);
+                    break;
                 case 7:
+                    restart(p, op_y);
+                    break;
                 default:
                     report_unknown(p);
             }
@@ -219,3 +300,4 @@ int step(struct Process *p) {
     }
     set_zero_flag(cpu);
     return 0;
+}
