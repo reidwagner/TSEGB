@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+
 #define REG_U(hi, lo, full) \
     union { \
         struct { \
@@ -44,9 +45,9 @@ struct Z80CPU {
     REG_U(h_p, l_p, hl_p)
     uint16_t ix;
     uint16_t iy;
-    uint16_t sp; 
-    uint16_t pc; 
-    uint8_t i; 
+    uint16_t sp;
+    uint16_t pc;
+    uint8_t i;
     uint8_t r;
 };
 
