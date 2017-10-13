@@ -1,6 +1,6 @@
 # TSE Z80 Emulator
 
-Implemented instructions. Values found in [disassembly tables](http://www.z80.info/decoding.htm) - r: 8-bit register, cc: conditional.
+Implemented instructions:
 
 - NOP
 - ADD A,r
@@ -19,8 +19,11 @@ Implemented instructions. Values found in [disassembly tables](http://www.z80.in
 - LD A,(DE)
 - LD A,(nn)
 - LD HL,(nn)
-- JP cc, n
+- JP cc, nn
+- JP nn
 - HALT
+
+where r and cc are found in [disassembly tables](http://www.z80.info/decoding.htm).
 
 The [zasm](https://k1.spdns.de/Develop/Projects/zasm/Distributions/) assembler can be used to assemble the programs in assembly/src/.
 
