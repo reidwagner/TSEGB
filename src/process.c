@@ -114,11 +114,11 @@ void relative_jump(struct Process *p, uint8_t op_y) {
     }
 }
 
-void two_byte_load_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void two_byte_ld_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
     report_unknown(p);
 }
 
-void indirect_load(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void indirect_ld(struct Process *p, uint8_t op_q, uint8_t op_p) {
     report_unknown(p);
 }
 
@@ -138,11 +138,11 @@ void accumulator_op(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 }
 
-void byte_load(struct Process *p, uint8_t op_y, uint8_t op_z) {
+void byte_ld(struct Process *p, uint8_t op_y, uint8_t op_z) {
     report_unknown(p);
 }
 
-void byte_load_imm(struct Process *p, uint8_t op_y) {
+void byte_ld_imm(struct Process *p, uint8_t op_y) {
     if (op_y == 6)
         *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
     else
@@ -252,10 +252,10 @@ int step(struct Process *p) {
                     relative_jump(p, op_y);
                     break;
                 case 1:
-                    two_byte_load_imm_add(p, op_q, op_p);
+                    two_byte_ld_imm_add(p, op_q, op_p);
                     break;
                 case 2:
-                    indirect_load(p, op_q, op_p);
+                    indirect_ld(p, op_q, op_p);
                     break;
                 case 3:
                     two_byte_inc_dec(p, op_q, op_p);
@@ -267,7 +267,7 @@ int step(struct Process *p) {
                     byte_dec(p, op_y);
                     break;
                 case 6:
-                    byte_load_imm(p, op_y);
+                    byte_ld_imm(p, op_y);
                     break;
                 case 7:
                     accumulator_op(p, op_y);
@@ -281,7 +281,7 @@ int step(struct Process *p) {
                 halt(p);
                 return -1;
             } else {
-                byte_load(p, op_y, op_z);
+                byte_ld(p, op_y, op_z);
                 break;
             }
         case 2:
