@@ -328,6 +328,7 @@ int step(struct Process *p) {
                 byte_ld(p, op_y, op_z);
                 break;
             }
+            break;
         case 2:
             alu_r_operation(p, op_y, op_z);
             break;
