@@ -19,6 +19,20 @@ enum {
 };
 
 enum {
+    RP_BC,
+    RP_DE,
+    RP_HL,
+    RP_SP
+};
+
+enum {
+    RP2_BC,
+    RP2_DE,
+    RP2_HL,
+    RP2_AF
+};
+
+enum {
     ALU_ADD,
     ALU_ADC,
     ALU_SUB,
@@ -47,6 +61,8 @@ struct Process {
     int iterations;
     int max_iterations;
     uint8_t *r_table[8];
+    uint16_t *rp_table[8];
+    uint16_t *rp2_table[8];
     uint8_t (*cc_table[8]) (struct Z80CPU*);
     void (*alu_table[8]) (struct Z80CPU*, uint8_t);
 };

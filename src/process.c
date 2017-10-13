@@ -28,6 +28,16 @@ struct Process *newprocess(size_t memsize) {
     p->r_table[R_HL] = NULL; // Best way to handle? Nothing goes here.
     p->r_table[R_A] = &p->cpu->a;
 
+    p->rp_table[RP_BC] = &p->cpu->bc;
+    p->rp_table[RP_DE] = &p->cpu->de;
+    p->rp_table[RP_HL] = &p->cpu->hl;
+    p->rp_table[RP_SP] = &p->cpu->sp;
+
+    p->rp_table[RP2_BC] = &p->cpu->bc;
+    p->rp_table[RP2_DE] = &p->cpu->de;
+    p->rp_table[RP2_HL] = &p->cpu->hl;
+    p->rp_table[RP2_AF] = &p->cpu->af;
+
     p->cc_table[CC_Z] = &check_condition_z;
     p->cc_table[CC_NZ] = &check_condition_nz;
 
@@ -119,7 +129,17 @@ void relative_jump(struct Process *p, uint8_t op_y) {
 }
 
 void two_byte_ld_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
-    report_unknown(p);
+    switch (op_q) {
+    case 0:
+        *p->rp_table[op_p] = nexttwob(p);
+        return;
+    case 1:
+        p->cpu->hl += *p->rp_table[op_p];
+        return;
+    default:
+        report_unknown(p);
+        return;
+    }
 }
 
 void ld_indirect(struct Process *p, uint8_t op_q, uint8_t op_p) {

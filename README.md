@@ -19,6 +19,8 @@ Implemented instructions:
 - LD A,(DE)
 - LD A,(nn)
 - LD HL,(nn)
+- LD rp,nn
+- ADD HL,rp
 - JP cc, nn
 - JP nn
 - HALT
