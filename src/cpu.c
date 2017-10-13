@@ -11,11 +11,23 @@ void registerdump(struct Z80CPU *cpu) {
     printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
             cpu->a, cpu->f, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->i, cpu->r);
     printf("\n");
+    printf("%-6s %-6s %-6s",
+           "bc", "de", "hl");
+    printf("\n");
+    printf("%-6d %-6d %-6d",
+           cpu->bc, cpu->de, cpu->hl);
+    printf("\n");
     printf("%-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s",
             "ap", "bp", "cp", "dp", "ep", "hp", "lp", "ix", "iy", "sp", "pc");
     printf("\n");
     printf("%-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d %-3d",
             cpu->a_p, cpu->b_p, cpu->c_p, cpu->d_p, cpu->e_p, cpu->h_p, cpu->l_p, cpu->ix, cpu->iy, cpu->sp, cpu->pc);
+    printf("\n");
+    printf("%-6s %-6s %-6s",
+           "bc_p", "de_p", "hl_p");
+    printf("\n");
+    printf("%-6d %-6d %-6d",
+           cpu->bc_p, cpu->de_p, cpu->hl_p);
     printf("\n");
     printf("%-3s %-3s %-3s %-3s %-3s %-3s %-3s %-3s",
             "S", "Z", "F5", "H", "F3", "PV", "N", "C");
