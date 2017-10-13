@@ -36,13 +36,13 @@
 
 struct Z80CPU {
     REG_U_BITFIELD(a, f, af)
-    REG_U(b, c, bc)
-    REG_U(d, e, de )
-    REG_U(h, l, hl )
+    REG_U(c, b, bc)
+    REG_U(e, d, de )
+    REG_U(l, h, hl )
     REG_U_BITFIELD(a_p, f_p, af_p)
-    REG_U(b_p, c_p, bc_p)
-    REG_U(d_p, e_p, de_p)
-    REG_U(h_p, l_p, hl_p)
+    REG_U(c_p, b_p, bc_p)
+    REG_U(e_p, d_p, de_p)
+    REG_U(l_p, h_p, hl_p)
     uint16_t ix;
     uint16_t iy;
     uint16_t sp;
