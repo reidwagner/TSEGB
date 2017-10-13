@@ -3,14 +3,22 @@
 Implemented instructions. Values found in [disassembly tables](http://www.z80.info/decoding.htm) - r: 8-bit register, cc: conditional.
 
 - NOP
-- ADD A, r
-- SUB A, r
-- ADC A, r
-- AND A, r
-- XOR A, r
-- OR A, r
-- LD r, n
-- LD (HL), n
+- ADD A,r
+- SUB A,r
+- ADC A,r
+- AND A,r
+- XOR A,r
+- OR A,r
+- LD r,n
+- LD (HL),n
+- LD (BC),A
+- LD (DE),A
+- LD (nn),A
+- LD (nn),HL
+- LD A,(BC)
+- LD A,(DE)
+- LD A,(nn)
+- LD HL,(nn)
 - JP cc, n
 - HALT
 

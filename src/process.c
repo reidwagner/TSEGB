@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include "process.h"
 #include "cpu.h"
 
@@ -82,6 +83,9 @@ void dump(struct Process *p) {
 /*----                  Helper functions                      ---*/
 /*--------------------------------------------------------------*/
 
+#define em_to_os(p, address) (p)->mem + (address)
+#define os_to_em(p, address) (address) - (p)->mem
+
 /* Think about making these inlines or macros. */
 uint8_t currb(struct Process *p) {
     return p->mem[p->cpu->pc - 1];
@@ -118,8 +122,48 @@ void two_byte_ld_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
     report_unknown(p);
 }
 
-void indirect_ld(struct Process *p, uint8_t op_q, uint8_t op_p) {
-    report_unknown(p);
+void ld_indirect(struct Process *p, uint8_t op_q, uint8_t op_p) {
+    struct Z80CPU *cpu = p->cpu;
+    switch (op_q) {
+    case 0:
+        switch (op_p) {
+        case 0:
+            memcpy(em_to_os(p, cpu->bc), &cpu->a, 1);
+            return;
+        case 1:
+            memcpy(em_to_os(p, cpu->de), &cpu->a, 1);
+            return;
+        case 2:
+            memcpy(em_to_os(p, nexttwob(p)), &cpu->hl, 2);
+            return;
+        case 3:
+            memcpy(em_to_os(p, nexttwob(p)), &cpu->a, 1);
+            return;
+        default:
+            report_unknown(p);
+        }
+        return;
+    case 1:
+        switch (op_p) {
+        case 0:
+            memcpy(&cpu->a, em_to_os(p, cpu->bc), 1);
+            return;
+        case 1:
+            memcpy(&cpu->a, em_to_os(p, cpu->de), 1);
+            return;
+        case 2:
+            memcpy(&cpu->hl, em_to_os(p, nexttwob(p)), 2);
+            return;
+        case 3:
+            memcpy(&cpu->a, em_to_os(p, nexttwob(p)), 1);
+            return;
+        default:
+            report_unknown(p);
+        }
+        return;
+    default:
+        report_unknown(p);
+    }
 }
 
 void two_byte_inc_dec(struct Process *p, uint8_t op_q, uint8_t op_p) {
@@ -255,7 +299,7 @@ int step(struct Process *p) {
                     two_byte_ld_imm_add(p, op_q, op_p);
                     break;
                 case 2:
-                    indirect_ld(p, op_q, op_p);
+                    ld_indirect(p, op_q, op_p);
                     break;
                 case 3:
                     two_byte_inc_dec(p, op_q, op_p);
