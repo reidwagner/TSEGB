@@ -2,28 +2,21 @@
 
 Implemented instructions:
 
-- NOP
-- ADD A,r
-- SUB A,r
-- ADC A,r
-- AND A,r
-- XOR A,r
-- OR A,r
-- LD r,n
-- LD (HL),n
-- LD (BC),A
-- LD (DE),A
-- LD (nn),A
-- LD (nn),HL
-- LD A,(BC)
-- LD A,(DE)
-- LD A,(nn)
-- LD HL,(nn)
-- LD rp,nn
-- ADD HL,rp
-- JP cc, nn
-- JP nn
-- HALT
+```
+NOP           LD A,(BC)     HALT
+ADD A,r       LD A,(DE)
+SUB A,r       LD A,(nn)
+ADC A,r       LD HL,(nn)
+AND A,r       LD rp,nn
+XOR A,r       ADD HL,rp
+OR A,r        JP cc, nn
+LD r,n        JP nn
+LD (HL),n     INC rp
+LD (BC),A     DEC rp
+LD (DE),A     INC r
+LD (nn),A     DEC r
+LD (nn),HL    LD r,r
+```
 
 where r and cc are found in [disassembly tables](http://www.z80.info/decoding.htm).
 

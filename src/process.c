@@ -33,10 +33,10 @@ struct Process *newprocess(size_t memsize) {
     p->rp_table[RP_HL] = &p->cpu->hl;
     p->rp_table[RP_SP] = &p->cpu->sp;
 
-    p->rp_table[RP2_BC] = &p->cpu->bc;
-    p->rp_table[RP2_DE] = &p->cpu->de;
-    p->rp_table[RP2_HL] = &p->cpu->hl;
-    p->rp_table[RP2_AF] = &p->cpu->af;
+    p->rp2_table[RP2_BC] = &p->cpu->bc;
+    p->rp2_table[RP2_DE] = &p->cpu->de;
+    p->rp2_table[RP2_HL] = &p->cpu->hl;
+    p->rp2_table[RP2_AF] = &p->cpu->af;
 
     p->cc_table[CC_Z] = &check_condition_z;
     p->cc_table[CC_NZ] = &check_condition_nz;
@@ -187,15 +187,25 @@ void ld_indirect(struct Process *p, uint8_t op_q, uint8_t op_p) {
 }
 
 void two_byte_inc_dec(struct Process *p, uint8_t op_q, uint8_t op_p) {
-    report_unknown(p);
+    switch (op_q) {
+    case 0:
+        *p->rp_table[op_p] += 1;
+        return;
+    case 1:
+        *p->rp_table[op_p] -= 1;
+        return;
+    default:
+        report_unknown(p);
+        return;
+    }
 }
 
 void byte_inc(struct Process *p, uint8_t op_y) {
-    report_unknown(p);
+    *p->r_table[op_y] += 1;
 }
 
 void byte_dec(struct Process *p, uint8_t op_y) {
-    report_unknown(p);
+    *p->r_table[op_y] -= 1;
 }
 
 void accumulator_op(struct Process *p, uint8_t op_y) {
@@ -203,7 +213,7 @@ void accumulator_op(struct Process *p, uint8_t op_y) {
 }
 
 void byte_ld(struct Process *p, uint8_t op_y, uint8_t op_z) {
-    report_unknown(p);
+    *p->r_table[op_y] = *p->r_table[op_z];
 }
 
 void byte_ld_imm(struct Process *p, uint8_t op_y) {
