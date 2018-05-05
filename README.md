@@ -3,8 +3,8 @@
 Implemented instructions:
 
 ```
-NOP           LD A,(BC)     HALT
-ADD A,r       LD A,(DE)
+NOP           LD A,(BC)     DJNZ
+ADD A,r       LD A,(DE)     HALT
 SUB A,r       LD A,(nn)
 ADC A,r       LD HL,(nn)
 AND A,r       LD rp,nn

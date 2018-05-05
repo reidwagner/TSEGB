@@ -123,6 +123,11 @@ void decode_0_0(struct Process *p, uint8_t op_y) {
     switch (op_y) {
     case 0:
         break;
+    case 2:
+        p->cpu->b--;
+        if (p->cpu->b != 0)
+            p->cpu->pc += (int8_t)nextb(p);
+        break;
     default:
         report_unknown(p);
     }
