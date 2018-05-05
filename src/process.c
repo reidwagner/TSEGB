@@ -119,7 +119,7 @@ void report_unknown(struct Process *p) {
 /*---- Functions for groups of operations defined by x and z ---*/
 /*--------------------------------------------------------------*/
 
-void relative_jump(struct Process *p, uint8_t op_y) {
+void decode_0_0(struct Process *p, uint8_t op_y) {
     switch (op_y) {
     case 0:
         break;
@@ -128,7 +128,7 @@ void relative_jump(struct Process *p, uint8_t op_y) {
     }
 }
 
-void two_byte_ld_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void decode_0_1(struct Process *p, uint8_t op_q, uint8_t op_p) {
     switch (op_q) {
     case 0:
         *p->rp_table[op_p] = nexttwob(p);
@@ -142,7 +142,7 @@ void two_byte_ld_imm_add(struct Process *p, uint8_t op_q, uint8_t op_p) {
     }
 }
 
-void ld_indirect(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void decode_0_2(struct Process *p, uint8_t op_q, uint8_t op_p) {
     struct Z80CPU *cpu = p->cpu;
     switch (op_q) {
     case 0:
@@ -186,7 +186,7 @@ void ld_indirect(struct Process *p, uint8_t op_q, uint8_t op_p) {
     }
 }
 
-void two_byte_inc_dec(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void decode_0_3(struct Process *p, uint8_t op_q, uint8_t op_p) {
     switch (op_q) {
     case 0:
         *p->rp_table[op_p] += 1;
@@ -200,53 +200,52 @@ void two_byte_inc_dec(struct Process *p, uint8_t op_q, uint8_t op_p) {
     }
 }
 
-void byte_inc(struct Process *p, uint8_t op_y) {
+void decode_0_4(struct Process *p, uint8_t op_y) {
     *p->r_table[op_y] += 1;
 }
 
-void byte_dec(struct Process *p, uint8_t op_y) {
+void decode_0_5(struct Process *p, uint8_t op_y) {
     *p->r_table[op_y] -= 1;
 }
 
-void accumulator_op(struct Process *p, uint8_t op_y) {
+void decode_0_7(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 }
 
-void byte_ld(struct Process *p, uint8_t op_y, uint8_t op_z) {
+void decode_1_n(struct Process *p, uint8_t op_y, uint8_t op_z) {
     *p->r_table[op_y] = *p->r_table[op_z];
 }
 
-void byte_ld_imm(struct Process *p, uint8_t op_y) {
+void decode_0_6(struct Process *p, uint8_t op_y) {
     if (op_y == 6)
         *((p->cpu->h << 8) + p->cpu->l + p->mem) = nextb(p);
     else
         *(p->r_table[op_y]) = nextb(p);
 }
 
-void alu_r_operation(struct Process *p, uint8_t op_y, uint8_t op_z) {
+void decode_2_n(struct Process *p, uint8_t op_y, uint8_t op_z) {
     p->alu_table[op_y](p->cpu, *(p->r_table[op_z]));
 }
 
-void conditional_jump(struct Process *p, uint8_t op_y) {
+void decode_3_2(struct Process *p, uint8_t op_y) {
     uint8_t cc = p->cc_table[op_y](p->cpu);
     if (cc)
         p->cpu->pc = nexttwob(p);
 }
 
-void conditional_return(struct Process *p, uint8_t op_y) {
+void decode_3_0(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 }
 
-void conditional_call(struct Process *p, uint8_t op_y) {
+void decode_3_4(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 }
 
-void misc_op(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void decode_3_1(struct Process *p, uint8_t op_q, uint8_t op_p) {
     report_unknown(p);
 }
 
-/* Needs better name */
-void misc_op_2(struct Process *p, uint8_t op_y) {
+void decode_3_3(struct Process *p, uint8_t op_y) {
     switch (op_y) {
     case 0:
         p->cpu->pc = nexttwob(p);
@@ -262,16 +261,16 @@ void misc_op_2(struct Process *p, uint8_t op_y) {
     }
 }
 
-void misc_op_3(struct Process *p, uint8_t op_q, uint8_t op_p) {
+void decode_3_5(struct Process *p, uint8_t op_q, uint8_t op_p) {
     report_unknown(p);
 }
 
-void alu_immediate(struct Process *p, uint8_t op_y) {
+void decode_3_6(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 
 }
 
-void restart (struct Process *p, uint8_t op_y) {
+void decode_3_7(struct Process *p, uint8_t op_y) {
     report_unknown(p);
 }
 
@@ -323,28 +322,28 @@ int step(struct Process *p) {
         case 0:
             switch (op_z) {
                 case 0:
-                    relative_jump(p, op_y);
+                    decode_0_0(p, op_y);
                     break;
                 case 1:
-                    two_byte_ld_imm_add(p, op_q, op_p);
+                    decode_0_1(p, op_q, op_p);
                     break;
                 case 2:
-                    ld_indirect(p, op_q, op_p);
+                    decode_0_2(p, op_q, op_p);
                     break;
                 case 3:
-                    two_byte_inc_dec(p, op_q, op_p);
+                    decode_0_3(p, op_q, op_p);
                     break;
                 case 4:
-                    byte_inc(p, op_y);
+                    decode_0_4(p, op_y);
                     break;
                 case 5:
-                    byte_dec(p, op_y);
+                    decode_0_5(p, op_y);
                     break;
                 case 6:
-                    byte_ld_imm(p, op_y);
+                    decode_0_6(p, op_y);
                     break;
                 case 7:
-                    accumulator_op(p, op_y);
+                    decode_0_7(p, op_y);
                     break;
                 default:
                     report_unknown(p);
@@ -355,38 +354,38 @@ int step(struct Process *p) {
                 halt(p);
                 return -1;
             } else {
-                byte_ld(p, op_y, op_z);
+                decode_1_n(p, op_y, op_z);
                 break;
             }
             break;
         case 2:
-            alu_r_operation(p, op_y, op_z);
+            decode_2_n(p, op_y, op_z);
             break;
         case 3:
             switch (op_z) {
                 case 0:
-                    conditional_return(p, op_y);
+                    decode_3_0(p, op_y);
                     break;
                 case 1:
-                    misc_op(p, op_q, op_p);
+                    decode_3_1(p, op_q, op_p);
                     break;
                 case 2:
-                    conditional_jump(p, op_y);
+                    decode_3_2(p, op_y);
                     break;
                 case 3:
-                    misc_op_2(p, op_y);
+                    decode_3_3(p, op_y);
                     break;
                 case 4:
-                    conditional_call(p, op_y);
+                    decode_3_4(p, op_y);
                     break;
                 case 5:
-                    misc_op_3(p, op_q, op_p);
+                    decode_3_5(p, op_q, op_p);
                     break;
                 case 6:
-                    alu_immediate(p, op_y);
+                    decode_3_6(p, op_y);
                     break;
                 case 7:
-                    restart(p, op_y);
+                    decode_3_7(p, op_y);
                     break;
                 default:
                     report_unknown(p);
