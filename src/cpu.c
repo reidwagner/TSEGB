@@ -5,6 +5,27 @@
 
 #define print_reg_col(label, reg) printf("%-5s %6d\n", label, reg);
 
+void add_n(struct Z80CPU *cpu, uint8_t a);
+void adc_n(struct Z80CPU *cpu, uint8_t a);
+void sub_n(struct Z80CPU *cpu, uint8_t a);
+void sbc_n(struct Z80CPU *cpu, uint8_t a);
+void and_n(struct Z80CPU *cpu, uint8_t a);
+void xor_n(struct Z80CPU *cpu, uint8_t a);
+void or_n(struct Z80CPU *cpu, uint8_t a);
+void cp_n(struct Z80CPU *cpu, uint8_t a);
+void rlc(struct Z80CPU *cpu);
+void rrc(struct Z80CPU *cpu);
+void rl(struct Z80CPU *cpu);
+void rr(struct Z80CPU *cpu);
+void sla(struct Z80CPU *cpu);
+void sra(struct Z80CPU *cpu);
+void sll(struct Z80CPU *cpu);
+void srl(struct Z80CPU *cpu);
+void set_zero_flag(struct Z80CPU *cpu);
+uint8_t check_condition_z(struct Z80CPU *cpu);
+uint8_t check_condition_nz(struct Z80CPU *cpu);
+void report_unknown(struct Z80CPU *cpu);
+
 struct Z80CPU *newcpu() {
     struct Z80CPU *cpu = malloc(sizeof(struct Z80CPU));
     struct Z80CPU_REG *r = malloc(sizeof(struct Z80CPU_REG));
@@ -67,6 +88,15 @@ struct Z80CPU *newcpu() {
     cpu->alu_table[ALU_OR] = &or_n;
     cpu->alu_table[ALU_CP] = &cp_n;
 
+    cpu->rot_table[ROT_RLC] = &rlc;
+    cpu->rot_table[ROT_RRC] = &rrc;
+    cpu->rot_table[ROT_RL]  = &rl;
+    cpu->rot_table[ROT_RR]  = &rr;
+    cpu->rot_table[ROT_SLA] = &sla;
+    cpu->rot_table[ROT_SRA] = &sra;
+    cpu->rot_table[ROT_SLL] = &sll;
+    cpu->rot_table[ROT_SRL] = &srl;
+
     return cpu;
 }
 
@@ -122,11 +152,46 @@ void cp_n(struct Z80CPU *cpu, uint8_t n) {
     ; //TODO
 }
 
+void rlc(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void rrc(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void rl(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void rr(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void sla(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void sra(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void sll(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void srl(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
 /*----                  Helper functions                      ---*/
 /*--------------------------------------------------------------*/
 
-#define em_to_os(p, address) (p)->mem + (address)
-#define os_to_em(p, address) (address) - (p)->mem
+#define em_to_os(p, address) ((p)->mem + (address))
+#define os_to_em(p, address) ((address) - (p)->mem)
+
+#define LO_BYTE(x) (x & 0xFF)
+#define HI_BYTE(x) (x >> 8)
 
 /* Think about making these inlines or macros. */
 uint8_t currb(struct Z80CPU *cpu) {
@@ -135,6 +200,17 @@ uint8_t currb(struct Z80CPU *cpu) {
 
 uint8_t nextb(struct Z80CPU *cpu) {
     return cpu->mem[cpu->r->pc++];
+}
+
+uint16_t sp_pop(struct Z80CPU *cpu) {
+    uint8_t lo = *em_to_os(cpu, cpu->r->sp++);
+    uint8_t hi = *em_to_os(cpu, cpu->r->sp++);
+    return (hi << 8) + lo;
+}
+
+void sp_push(struct Z80CPU *cpu, uint16_t val) {
+    *em_to_os(cpu, cpu->r->sp--) = HI_BYTE(val);
+    *em_to_os(cpu, cpu->r->sp--) = LO_BYTE(val);
 }
 
 uint16_t nexttwob(struct Z80CPU *cpu) {
@@ -151,15 +227,35 @@ void report_unknown(struct Z80CPU *cpu) {
 /*---- Functions for groups of operations defined by x and z ---*/
 /*--------------------------------------------------------------*/
 
-// TODO
+void decode_cb(struct Z80CPU *cpu, uint8_t op_x) {
+    report_unknown(cpu);
+}
+
+// TODO TEST
 void decode_0_0(struct Z80CPU *cpu, uint8_t op_y) {
+    uint16_t tmp;
     switch (op_y) {
     case 0:
+        break;
+    case 1:
+        tmp = cpu->r->af;
+        cpu->r->af = cpu->r->af_p;
+        cpu->r->af_p = tmp;
         break;
     case 2:
         cpu->r->b--;
         if (cpu->r->b != 0)
             cpu->r->pc += (int8_t)nextb(cpu);
+        break;
+    case 3:
+        cpu->r->pc += (int8_t)(nextb(cpu));
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        if (cpu->cc_table[op_y - 4](cpu))
+            cpu->r->pc += (int8_t)(nextb(cpu));
         break;
     default:
         report_unknown(cpu);
@@ -260,7 +356,44 @@ void decode_0_6(struct Z80CPU *cpu, uint8_t op_y) {
 
 // TODO
 void decode_0_7(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
+    uint8_t tmp;
+    switch (op_y) {
+    case 0:
+        cpu->r->f_C = cpu->r->a >> 7;
+        cpu->r->a <<= 1;
+        cpu->r->a |= cpu->r->f_C;
+        break;
+    case 1:
+        cpu->r->f_C = cpu->r->a & 1;
+        cpu->r->a >>= 1;
+        cpu->r->a |= cpu->r->f_C << 7;
+        break;
+    case 2:
+        tmp = cpu->r->a >> 7;
+        cpu->r->a <<= 1;
+        cpu->r->a |= cpu->r->f_C;
+        cpu->r->f_C = tmp;
+    case 3:
+        tmp = cpu->r->a & 1;
+        cpu->r->a >>= 1;
+        cpu->r->a |= cpu->r->f_C << 7;
+        cpu->r->f_C = tmp;
+        break;
+    case 5:
+        cpu->r->a ^= 0xFF;
+        // Is this correct?
+        cpu->r->f_H = 1;
+        cpu->r->f_N = 1;
+        break;
+    case 6:
+        cpu->r->f_C = 1;;
+        break;
+    case 7:
+        cpu->r->f_C ^= 1;;
+        break;
+    default:
+        report_unknown(cpu);
+    }
 }
 
 // DONE
@@ -273,14 +406,38 @@ void decode_2_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
     cpu->alu_table[op_y](cpu, *(cpu->r_table[op_z]));
 }
 
-// TODO
+// DONE
 void decode_3_0(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
+    uint8_t cc = cpu->cc_table[op_y](cpu);
+    if (cc)
+        cpu->r->pc = sp_pop(cpu);
 }
 
-// TODO
+// Z80: TODO
+// GB:  DONE
 void decode_3_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
-    report_unknown(cpu);
+    switch (op_q) {
+    case 0:
+        *cpu->rp2_table[op_p] = sp_pop(cpu);
+        break;
+    case 1:
+        switch(op_p) {
+        case 0:
+            cpu->r->pc = sp_pop(cpu);
+            break;
+        case 2:
+            cpu->r->pc = cpu->r->hl;
+            break;
+        case 3:
+            cpu->r->sp = cpu->r->hl;
+            break;
+        default:
+            report_unknown(cpu);
+        }
+        break;
+    default:
+       report_unknown(cpu);
+    }
 }
 
 // DONE
@@ -297,6 +454,8 @@ void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
         cpu->r->pc = nexttwob(cpu);
         break;
     case 1:
+        decode_cb(cpu, 3);
+        break;
     case 2:
     case 3:
     case 4:

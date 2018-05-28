@@ -3,19 +3,19 @@
 Implemented instructions:
 
 ```
-NOP           LD A,(BC)     DJNZ
-ADD A,r       LD A,(DE)     HALT
-SUB A,r       LD A,(nn)
-ADC A,r       LD HL,(nn)
-AND A,r       LD rp,nn
-XOR A,r       ADD HL,rp
-OR A,r        JP cc, nn
-LD r,n        JP nn
-LD (HL),n     INC rp
-LD (BC),A     DEC rp
-LD (DE),A     INC r
-LD (nn),A     DEC r
-LD (nn),HL    LD r,r
+NOP           LD A,(BC)     DJNZ          RET
+ADD A,r       LD A,(DE)     HALT          JP HL
+SUB A,r       LD A,(nn)     EX AF,AF'     LD SP,HL 
+ADC A,r       LD HL,(nn)    JR d
+AND A,r       LD rp,nn      JR cc[y=4],d
+XOR A,r       ADD HL,rp     RLCA
+OR A,r        JP cc, nn     RRCA
+LD r,n        JP nn         RLA
+LD (HL),n     INC rp        RRA
+LD (BC),A     DEC rp        CPL
+LD (DE),A     INC r         SCF
+LD (nn),A     DEC r         CCF
+LD (nn),HL    LD r,r        RET cc[y]
 ```
 
 where r and cc are found in [disassembly tables](http://www.z80.info/decoding.htm).

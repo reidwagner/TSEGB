@@ -72,6 +72,17 @@ enum {
 };
 
 enum {
+    ROT_RLC,
+    ROT_RRC,
+    ROT_RL,
+    ROT_RR,
+    ROT_SLA,
+    ROT_SRA,
+    ROT_SLL,
+    ROT_SRL,
+};
+
+enum {
     CC_NZ,
     CC_Z,
     CC_NC,
@@ -107,6 +118,7 @@ struct Z80CPU {
     uint16_t *rp2_table[8];
     uint8_t (*cc_table[8]) (struct Z80CPU*);
     void (*alu_table[8]) (struct Z80CPU*, uint8_t);
+    void (*rot_table[8]) (struct Z80CPU*);
 };
 
 void registerdump(struct Z80CPU *cpu);
@@ -114,18 +126,6 @@ void registerdump(struct Z80CPU *cpu);
 struct Z80CPU *newcpu();
 
 int execute(struct Z80CPU *cpu);
-
-void add_n(struct Z80CPU *cpu, uint8_t a);
-void adc_n(struct Z80CPU *cpu, uint8_t a);
-void sub_n(struct Z80CPU *cpu, uint8_t a);
-void sbc_n(struct Z80CPU *cpu, uint8_t a);
-void and_n(struct Z80CPU *cpu, uint8_t a);
-void xor_n(struct Z80CPU *cpu, uint8_t a);
-void or_n(struct Z80CPU *cpu, uint8_t a);
-void cp_n(struct Z80CPU *cpu, uint8_t a);
-void set_zero_flag(struct Z80CPU *cpu);
-uint8_t check_condition_z(struct Z80CPU *cpu);
-uint8_t check_condition_nz(struct Z80CPU *cpu);
 
 extern bool verbose;
 
