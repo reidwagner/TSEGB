@@ -6,7 +6,8 @@ UNITY_SOURCES = $(wildcard test/unity/*.c)
 ASM_SOURCES = $(wildcard assembly/*.s)
 ASM_BIN = $(ASM_SOURCES:.s=.bin)
 
-ZASM = ./zasm-4.0.15-Linux64/zasm
+#ZASM = ./zasm-4.0.15-Linux64/zasm
+ZASM = ./zasm
 
 CC = gcc
 CFLAGS = -g

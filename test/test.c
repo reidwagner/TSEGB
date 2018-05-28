@@ -23,19 +23,19 @@ struct Process *run_process(char *binary_file_path) {
 
 void test_ld() {
     struct Process *p = run_process("assembly/LD.bin");
-    TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
-    TEST_ASSERT_EQUAL_INT(2, p->cpu->b);
-    TEST_ASSERT_EQUAL_INT(3, p->cpu->c);
-    TEST_ASSERT_EQUAL_INT(4, p->cpu->d);
-    TEST_ASSERT_EQUAL_INT(5, p->cpu->e);
-    TEST_ASSERT_EQUAL_INT(6, p->cpu->h);
-    TEST_ASSERT_EQUAL_INT(7, p->cpu->l);
+    TEST_ASSERT_EQUAL_INT(1, p->cpu->r->a);
+    TEST_ASSERT_EQUAL_INT(2, p->cpu->r->b);
+    TEST_ASSERT_EQUAL_INT(3, p->cpu->r->c);
+    TEST_ASSERT_EQUAL_INT(4, p->cpu->r->d);
+    TEST_ASSERT_EQUAL_INT(5, p->cpu->r->e);
+    TEST_ASSERT_EQUAL_INT(6, p->cpu->r->h);
+    TEST_ASSERT_EQUAL_INT(7, p->cpu->r->l);
     free(p);
 }
 
 void test_add() {
     struct Process *p = run_process("assembly/ADD.bin");
-    TEST_ASSERT_EQUAL_INT(28, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(28, p->cpu->r->a);
     free(p);
 }
 
@@ -47,7 +47,7 @@ void test_and() {
       1 & 1 -> 1
     */
     stepn(p, 3);
-    TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(1, p->cpu->r->a);
 
     /*
       1 & 0 -> 0
@@ -56,7 +56,7 @@ void test_and() {
     */
     for (j = 0; j < 3; j++) {
         stepn(p, 2);
-        TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+        TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
     }
 
     free(p);
@@ -70,7 +70,7 @@ void test_or() {
       0 | 0 -> 0
     */
     stepn(p, 3);
-    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
 
     /*
       0 | 1 -> 1
@@ -79,7 +79,7 @@ void test_or() {
     */
     for (j = 0; j < 3; j++) {
         stepn(p, 2);
-        TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
+        TEST_ASSERT_EQUAL_INT(1, p->cpu->r->a);
     }
 
     free(p);
@@ -93,25 +93,25 @@ void test_xor() {
       1 ^ 1 -> 0
     */
     stepn(p, 3);
-    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
 
     /*
       0 | 0 -> 0
     */
     stepn(p, 2);
-    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
 
     /*
       0 | 1 -> 1
     */
     stepn(p, 2);
-    TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(1, p->cpu->r->a);
 
     /*
       1 | 0 -> 1
     */
     stepn(p, 2);
-    TEST_ASSERT_EQUAL_INT(1, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(1, p->cpu->r->a);
 
     free(p);
 }
@@ -120,9 +120,9 @@ void test_jz() {
     struct Process *p = create_process("assembly/JZ.bin");
 
     step(p);
-    TEST_ASSERT_EQUAL_INT(5, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(5, p->cpu->r->a);
     run(p);
-    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
 
     free(p);
 }
@@ -131,9 +131,9 @@ void test_jp() {
     struct Process *p = create_process("assembly/JZ.bin");
 
     step(p);
-    TEST_ASSERT_EQUAL_INT(5, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(5, p->cpu->r->a);
     stepn(p, 10);
-    TEST_ASSERT_EQUAL_INT(0, p->cpu->a);
+    TEST_ASSERT_EQUAL_INT(0, p->cpu->r->a);
 
     free(p);
 }
