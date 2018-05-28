@@ -151,6 +151,7 @@ void report_unknown(struct Z80CPU *cpu) {
 /*---- Functions for groups of operations defined by x and z ---*/
 /*--------------------------------------------------------------*/
 
+// TODO
 void decode_0_0(struct Z80CPU *cpu, uint8_t op_y) {
     switch (op_y) {
     case 0:
@@ -165,6 +166,7 @@ void decode_0_0(struct Z80CPU *cpu, uint8_t op_y) {
     }
 }
 
+// DONE
 void decode_0_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     switch (op_q) {
     case 0:
@@ -179,6 +181,7 @@ void decode_0_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     }
 }
 
+// DONE
 void decode_0_2(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     switch (op_q) {
     case 0:
@@ -222,6 +225,7 @@ void decode_0_2(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     }
 }
 
+// DONE
 void decode_0_3(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     switch (op_q) {
     case 0:
@@ -236,22 +240,17 @@ void decode_0_3(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     }
 }
 
+// DONE
 void decode_0_4(struct Z80CPU *cpu, uint8_t op_y) {
     *cpu->r_table[op_y] += 1;
 }
 
+// DONE
 void decode_0_5(struct Z80CPU *cpu, uint8_t op_y) {
     *cpu->r_table[op_y] -= 1;
 }
 
-void decode_0_7(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
-}
-
-void decode_1_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
-    *cpu->r_table[op_y] = *cpu->r_table[op_z];
-}
-
+// DONE
 void decode_0_6(struct Z80CPU *cpu, uint8_t op_y) {
     if (op_y == 6)
         *((cpu->r->h << 8) + cpu->r->l + cpu->mem) = nextb(cpu);
@@ -259,28 +258,39 @@ void decode_0_6(struct Z80CPU *cpu, uint8_t op_y) {
         *(cpu->r_table[op_y]) = nextb(cpu);
 }
 
+// TODO
+void decode_0_7(struct Z80CPU *cpu, uint8_t op_y) {
+    report_unknown(cpu);
+}
+
+// DONE
+void decode_1_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
+    *cpu->r_table[op_y] = *cpu->r_table[op_z];
+}
+
+// DONE
 void decode_2_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
     cpu->alu_table[op_y](cpu, *(cpu->r_table[op_z]));
 }
 
+// TODO
+void decode_3_0(struct Z80CPU *cpu, uint8_t op_y) {
+    report_unknown(cpu);
+}
+
+// TODO
+void decode_3_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
+    report_unknown(cpu);
+}
+
+// DONE
 void decode_3_2(struct Z80CPU *cpu, uint8_t op_y) {
     uint8_t cc = cpu->cc_table[op_y](cpu);
     if (cc)
         cpu->r->pc = nexttwob(cpu);
 }
 
-void decode_3_0(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
-}
-
-void decode_3_4(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
-}
-
-void decode_3_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
-    report_unknown(cpu);
-}
-
+// TODO
 void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
     switch (op_y) {
     case 0:
@@ -297,15 +307,23 @@ void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
     }
 }
 
+// TODO
+void decode_3_4(struct Z80CPU *cpu, uint8_t op_y) {
+    report_unknown(cpu);
+}
+
+// TODO
 void decode_3_5(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     report_unknown(cpu);
 }
 
+// TODO
 void decode_3_6(struct Z80CPU *cpu, uint8_t op_y) {
     report_unknown(cpu);
 
 }
 
+// TODO
 void decode_3_7(struct Z80CPU *cpu, uint8_t op_y) {
     report_unknown(cpu);
 }
@@ -314,7 +332,6 @@ void halt(struct Z80CPU *cpu) {
     if (verbose)
         printf("HALT\n");
 }
-
 
 /*----              Execute single instruction                --*/
 /*--------------------------------------------------------------*/
