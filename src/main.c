@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
         }
     }
     char *romfilename = argv[optind];
-    struct Process *p = newprocess(DEFAULT_MAX_MEMSIZE);
+    struct Process *p = newprocess(MEM_MAP_SIZE);
     if (max_iterations)
         p->max_iterations = max_iterations;
     if (verbose)
