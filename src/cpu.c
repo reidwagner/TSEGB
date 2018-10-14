@@ -97,6 +97,8 @@ struct Z80CPU *newcpu() {
     cpu->rot_table[ROT_SLL] = &sll;
     cpu->rot_table[ROT_SRL] = &srl;
 
+    cpu->interrupts_enabled = true;
+
     return cpu;
 }
 
@@ -228,6 +230,18 @@ void report_unknown(struct Z80CPU *cpu) {
 /*--------------------------------------------------------------*/
 
 void decode_cb(struct Z80CPU *cpu, uint8_t op_x) {
+    report_unknown(cpu);
+}
+
+void decode_dd(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void decode_ed(struct Z80CPU *cpu) {
+    report_unknown(cpu);
+}
+
+void decode_fd(struct Z80CPU *cpu) {
     report_unknown(cpu);
 }
 
@@ -447,7 +461,7 @@ void decode_3_2(struct Z80CPU *cpu, uint8_t op_y) {
         cpu->r->pc = nexttwob(cpu);
 }
 
-// TODO
+// DONE
 void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
     switch (op_y) {
     case 0:
@@ -457,34 +471,64 @@ void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
         decode_cb(cpu, 3);
         break;
     case 2:
+        // GB ABSENT
     case 3:
+        // GB ABSENT
     case 4:
+        // GB ABSENT
     case 5:
-    case 6:
-    case 7:
+        // GB ABSENT
         report_unknown(cpu);
+        break;
+    case 6:
+        cpu->interrupts_enabled = false;
+    case 7:
+        cpu->interrupts_enabled = true;
     }
 }
 
-// TODO
+// DONE
 void decode_3_4(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
+    if (cpu->cc_table[op_y](cpu)) {
+        sp_push(cpu, (uint16_t)cpu->r->pc+3);
+        cpu->r->pc = nexttwob(cpu);
+    }
 }
 
-// TODO
+// DONE
 void decode_3_5(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
-    report_unknown(cpu);
+    switch (op_q) {
+    case 0:
+        sp_push(cpu, *cpu->rp2_table[op_p]);
+        break;
+    case 1:
+        switch (op_p) {
+        case 0:
+            sp_push(cpu, (uint16_t)cpu->r->pc+3);
+            cpu->r->pc = nexttwob(cpu);
+            break;
+        case 1:
+            decode_dd(cpu);
+            break;
+        case 2:
+            decode_ed(cpu);
+            break;
+        case 3:
+            decode_fd(cpu);
+            break;
+        }
+    }
 }
 
-// TODO
+// DONE
 void decode_3_6(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
-
+    cpu->alu_table[op_y](cpu, nextb(cpu));
 }
 
-// TODO
+// DONE
 void decode_3_7(struct Z80CPU *cpu, uint8_t op_y) {
-    report_unknown(cpu);
+    sp_push(cpu, (uint16_t)cpu->r->pc+3);
+    cpu->r->pc = op_y*8;
 }
 
 void halt(struct Z80CPU *cpu) {

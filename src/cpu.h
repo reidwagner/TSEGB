@@ -112,6 +112,7 @@ struct Z80CPU_REG {
 
 struct Z80CPU {
     struct Z80CPU_REG *r;
+    bool interrupts_enabled;
     uint8_t *mem;
     uint8_t *r_table[8];
     uint16_t *rp_table[8];
