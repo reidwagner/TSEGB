@@ -1,4 +1,4 @@
-# TSE Z80 Emulator
+# Forking TSEZ80 to emulate Sharp LR35902 CPU and rest of Gameboy system.
 
 Implemented instructions:
 
