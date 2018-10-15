@@ -1,4 +1,4 @@
-# Forking TSEZ80 to emulate Sharp LR35902 CPU and rest of Gameboy system.
+# TSEGB
 
 Implemented instructions:
 
