@@ -454,11 +454,9 @@ void decode_3_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     }
 }
 
-// DONE
-void decode_3_2(struct Z80CPU *cpu, uint8_t op_y) {
-    uint8_t cc = cpu->cc_table[op_y](cpu);
-    if (cc)
-        cpu->r->pc = nexttwob(cpu);
+// Z80 <-> GB differ
+void decode_3_2(struct Z80CPU *cpu) {
+    memcpy(&cpu->r->a, em_to_os(cpu, nexttwob(cpu)), 1);
 }
 
 // DONE
@@ -604,7 +602,7 @@ int execute(struct Z80CPU *cpu) {
                     decode_3_1(cpu, op_q, op_p);
                     break;
                 case 2:
-                    decode_3_2(cpu, op_y);
+                    decode_3_2(cpu);
                     break;
                 case 3:
                     decode_3_3(cpu, op_y);
