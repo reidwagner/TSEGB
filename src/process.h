@@ -27,6 +27,7 @@ struct Process {
     struct Z80CPU *cpu;
     uint8_t *mem;
     size_t memsize;
+    uint16_t entry;
     int iterations;
     int max_iterations;
 };

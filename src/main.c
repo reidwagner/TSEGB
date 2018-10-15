@@ -8,9 +8,10 @@
 int main(int argc, char *argv[]) {
     int opt;
     int max_iterations = 0;
+    uint16_t entry = 0;
     if (argc < 2)
         goto usage_error;
-    while ((opt = getopt(argc, argv, "vi:")) != -1) {
+    while ((opt = getopt(argc, argv, "vsi:e:")) != -1) {
         switch (opt) {
             case 'v': 
                 verbose = true; 
@@ -18,14 +19,19 @@ int main(int argc, char *argv[]) {
             case 'i':
                 max_iterations = atoi(optarg);
                 break;
+            case 'e':
+                entry = strtol(optarg, NULL, 16);
+                break;
             default:
                 goto usage_error;
         }
     }
     char *romfilename = argv[optind];
-    struct Process *p = newprocess(MEM_MAP_SIZE);
+    struct Process *p = newprocess(MEM_MAP_SIZE + 1);
     if (max_iterations)
         p->max_iterations = max_iterations;
+    if (entry)
+        p->entry = entry;
     if (verbose)
         dump(p);
     FILE *romfp = fopen(romfilename, "r");
