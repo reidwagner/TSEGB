@@ -65,8 +65,6 @@ void dump(struct Process *p) {
 void run(struct Process *p) {
     p->cpu->r->pc = p->entry;
     while (step(p) != -1);
-        if (verbose)
-            dump(p);
 }
 
 int stepn(struct Process *p, int n) {

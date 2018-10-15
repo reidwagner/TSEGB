@@ -36,8 +36,6 @@ int main(int argc, char *argv[]) {
         dump(p);
     FILE *romfp = fopen(romfilename, "r");
     loadmemory(p, romfp);
-    if (verbose)
-        dump(p);
     run(p);
     return 0;
 
