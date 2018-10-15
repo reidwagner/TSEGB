@@ -25,6 +25,7 @@ void set_zero_flag(struct Z80CPU *cpu);
 uint8_t check_condition_z(struct Z80CPU *cpu);
 uint8_t check_condition_nz(struct Z80CPU *cpu);
 void report_unknown(struct Z80CPU *cpu);
+void decode_op(uint8_t op, uint8_t *op_x, uint8_t *op_y, uint8_t *op_z, uint8_t *op_p, uint8_t *op_q);
 
 struct Z80CPU *newcpu() {
     struct Z80CPU *cpu = malloc(sizeof(struct Z80CPU));
@@ -229,7 +230,23 @@ void report_unknown(struct Z80CPU *cpu) {
 /*---- Functions for groups of operations defined by x and z ---*/
 /*--------------------------------------------------------------*/
 
-void decode_cb(struct Z80CPU *cpu, uint8_t op_x) {
+// TODO
+void decode_cb(struct Z80CPU *cpu) {
+    uint8_t op = nextb(cpu);
+    uint8_t op_x, op_y, op_z, op_p, op_q;
+    decode_op(op, &op_x, &op_y,  &op_z,  &op_p,  &op_q);
+    switch (op_x) {
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+        *cpu->r_table[op_z] &= ~(1 << op_y);
+        break;
+    case 3:
+        *cpu->r_table[op_z] |= (1 << op_y);
+        break;
+    }
     report_unknown(cpu);
 }
 
@@ -464,7 +481,7 @@ void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
         cpu->r->pc = nexttwob(cpu);
         break;
     case 1:
-        decode_cb(cpu, 3);
+        decode_cb(cpu);
         break;
     case 2:
         // GB ABSENT
@@ -532,21 +549,25 @@ void halt(struct Z80CPU *cpu) {
         printf("HALT\n");
 }
 
+void decode_op(uint8_t op, uint8_t *op_x, uint8_t *op_y, uint8_t *op_z, uint8_t *op_p, uint8_t *op_q) {
+    *op_x = op >> 6;
+    *op_y = (op >> 3) % 8;
+    *op_z = op % 8;
+    *op_p = *op_y >> 1;
+    *op_q = *op_y % 2;
+}
+
 /*----              Execute single instruction                --*/
 /*--------------------------------------------------------------*/
 
 int execute(struct Z80CPU *cpu) {
 
     uint8_t op = nextb(cpu);
-
-    uint8_t op_x = op >> 6;
-    uint8_t op_y = (op >> 3) % 8;
-    uint8_t op_z = op % 8;
-    uint8_t op_p = op_y >> 1;
-    uint8_t op_q = op_y % 2;
+    uint8_t op_x, op_y, op_z, op_p, op_q;
+    decode_op(op, &op_x, &op_y,  &op_z,  &op_p,  &op_q);
 
     if (verbose)
-        printf("Opcode: %02x x: %d y: %d z: %d p %d q %d\n", op, op_x, op_y, op_z, op_p, op_q);
+        printf("PC: %04x Opcode: %02x x: %d y: %d z: %d p %d q %d\n", cpu->r->pc - 1, op, op_x, op_y, op_z, op_p, op_q);
 
     switch (op_x) {
         case 0:

@@ -13,8 +13,8 @@ OR A,r        JP cc, nn     RRCA          CALL nn
 LD r,n        JP nn         RLA           PUSH rp2[p]
 LD (HL),n     INC rp        RRA           alu[y] n
 LD (BC),A     DEC rp        CPL           RST y*8
-LD (DE),A     INC r         SCF
-LD (nn),A     DEC r         CCF
+LD (DE),A     INC r         SCF           SET y,r[z]
+LD (nn),A     DEC r         CCF           RES y,r[z]
 LD (nn),HL    LD r,r        RET cc[y]
 ```
 
