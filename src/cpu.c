@@ -420,11 +420,9 @@ void decode_2_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
     cpu->alu_table[op_y](cpu, *(cpu->r_table[op_z]));
 }
 
-// DONE
+// Z80 <-> GB differ
 void decode_3_0(struct Z80CPU *cpu, uint8_t op_y) {
-    uint8_t cc = cpu->cc_table[op_y](cpu);
-    if (cc)
-        cpu->r->pc = sp_pop(cpu);
+    memcpy(&cpu->r->a, 0xFF + em_to_os(cpu, nextb(cpu)), 1);
 }
 
 // Z80: TODO
