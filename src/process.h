@@ -21,7 +21,7 @@
 #define MEM_EI_REG            0xFFFF
 
 #define MEM_MAP_SIZE          0xFFFF
-#define DEFAULT_MAX_ITERATIONS 10000
+#define DEFAULT_MAX_ITERATIONS 1000000
 
 struct Process {
     struct Z80CPU *cpu;

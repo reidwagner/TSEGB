@@ -196,6 +196,15 @@ void srl(struct Z80CPU *cpu) {
 #define LO_BYTE(x) (x & 0xFF)
 #define HI_BYTE(x) (x >> 8)
 
+void stack_dump(struct Z80CPU *cpu, uint32_t length) {
+    uint8_t *tmp_sp = em_to_os(cpu, cpu->r->sp + length);
+    printf("[ Stack dump ]\n");
+    for (size_t i = 0; i < length; i++) {
+        printf("%x: %x\n", tmp_sp, *tmp_sp);
+        tmp_sp--;
+    }
+}
+
 /* Think about making these inlines or macros. */
 uint8_t currb(struct Z80CPU *cpu) {
     return cpu->mem[cpu->r->pc - 1];
@@ -208,12 +217,16 @@ uint8_t nextb(struct Z80CPU *cpu) {
 uint16_t sp_pop(struct Z80CPU *cpu) {
     uint8_t lo = *em_to_os(cpu, cpu->r->sp++);
     uint8_t hi = *em_to_os(cpu, cpu->r->sp++);
+    if (verbose)
+        printf("Pop %x\n", (hi << 8) + lo);
     return (hi << 8) + lo;
 }
 
 void sp_push(struct Z80CPU *cpu, uint16_t val) {
-    *em_to_os(cpu, cpu->r->sp--) = HI_BYTE(val);
-    *em_to_os(cpu, cpu->r->sp--) = LO_BYTE(val);
+    if (verbose)
+        printf("Push %x\n", val);
+    *em_to_os(cpu, --cpu->r->sp) = HI_BYTE(val);
+    *em_to_os(cpu, --cpu->r->sp) = LO_BYTE(val);
 }
 
 uint16_t nexttwob(struct Z80CPU *cpu) {
@@ -287,6 +300,8 @@ void decode_0_0(struct Z80CPU *cpu, uint8_t op_y) {
     case 7:
         if (cpu->cc_table[op_y - 4](cpu))
             cpu->r->pc += (int8_t)(nextb(cpu));
+        else
+            cpu->r->pc++;
         break;
     default:
         report_unknown(cpu);
@@ -319,8 +334,9 @@ void decode_0_2(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
         case 1:
             memcpy(em_to_os(cpu, cpu->r->de), &cpu->r->a, 1);
             return;
-        case 2:
-            memcpy(em_to_os(cpu, nexttwob(cpu)), &cpu->r->hl, 2);
+        case 2: // Differs on GB
+            memcpy(&cpu->r->a, em_to_os(cpu, cpu->r->hl), 1);
+            cpu->r->hl++;
             return;
         case 3:
             memcpy(em_to_os(cpu, nexttwob(cpu)), &cpu->r->a, 1);
@@ -503,7 +519,7 @@ void decode_3_3(struct Z80CPU *cpu, uint8_t op_y) {
 // DONE
 void decode_3_4(struct Z80CPU *cpu, uint8_t op_y) {
     if (cpu->cc_table[op_y](cpu)) {
-        sp_push(cpu, (uint16_t)cpu->r->pc+3);
+        sp_push(cpu, (uint16_t)cpu->r->pc+2);
         cpu->r->pc = nexttwob(cpu);
     }
 }
@@ -517,7 +533,7 @@ void decode_3_5(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
     case 1:
         switch (op_p) {
         case 0:
-            sp_push(cpu, (uint16_t)cpu->r->pc+3);
+            sp_push(cpu, (uint16_t)(cpu->r->pc+2));
             cpu->r->pc = nexttwob(cpu);
             break;
         case 1:
@@ -540,7 +556,7 @@ void decode_3_6(struct Z80CPU *cpu, uint8_t op_y) {
 
 // DONE
 void decode_3_7(struct Z80CPU *cpu, uint8_t op_y) {
-    sp_push(cpu, (uint16_t)cpu->r->pc+3);
+    sp_push(cpu, (uint16_t)cpu->r->pc+2);
     cpu->r->pc = op_y*8;
 }
 
@@ -568,6 +584,7 @@ int execute(struct Z80CPU *cpu) {
 
     if (verbose)
         printf("PC: %04x Opcode: %02x x: %d y: %d z: %d p %d q %d\n", cpu->r->pc - 1, op, op_x, op_y, op_z, op_p, op_q);
+
 
     switch (op_x) {
         case 0:

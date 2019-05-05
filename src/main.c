@@ -8,7 +8,7 @@
 int main(int argc, char *argv[]) {
     int opt;
     int max_iterations = 0;
-    uint16_t entry = 0;
+    uint16_t entry = 0x100;
     if (argc < 2)
         goto usage_error;
     while ((opt = getopt(argc, argv, "vsi:e:")) != -1) {

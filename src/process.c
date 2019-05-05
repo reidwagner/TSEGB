@@ -16,6 +16,7 @@ struct Process *newprocess(size_t memsize) {
     p->cpu = newcpu();
     p->mem = malloc(memsize*sizeof(uint8_t));
     p->cpu->mem = p->mem;
+    p->cpu->r->sp = MEM_RAM_INTERNAL_ECHO;
     p->memsize = memsize;
     p->max_iterations = DEFAULT_MAX_ITERATIONS;
     p->iterations = 0;
@@ -78,8 +79,10 @@ int stepn(struct Process *p, int n) {
 
 
 int step(struct Process *p) {
-    if (p->iterations++ >= p->max_iterations)
-        return -1;
+//    if (p->iterations++ >= p->max_iterations)
+//        return -1;
+//    if (verbose)
+//        registerdump(p->cpu);
     execute(p->cpu);
 }
 
