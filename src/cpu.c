@@ -248,16 +248,25 @@ void decode_cb(struct Z80CPU *cpu) {
     uint8_t op = nextb(cpu);
     uint8_t op_x, op_y, op_z, op_p, op_q;
     decode_op(op, &op_x, &op_y,  &op_z,  &op_p,  &op_q);
+    if (verbose)
+        printf("PC: %04x Opcode: %02x x: %d y: %d z: %d p %d q %d\n", cpu->r->pc - 1, op, op_x, op_y, op_z, op_p, op_q);
+
     switch (op_x) {
     case 0:
         break;
     case 1:
         break;
     case 2:
-        *cpu->r_table[op_z] &= ~(1 << op_y);
+        if (op_z == 6)
+            *em_to_os(cpu, cpu->r->hl) &= ~(1 << op_y);
+        else
+            *cpu->r_table[op_z] &= ~(1 << op_y);
         break;
     case 3:
-        *cpu->r_table[op_z] |= (1 << op_y);
+        if (op_z == 6)
+            *em_to_os(cpu, cpu->r->hl) |= (1 << op_y);
+        else
+            *cpu->r_table[op_z] |= (1 << op_y);
         break;
     }
     report_unknown(cpu);
@@ -338,8 +347,9 @@ void decode_0_2(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
             memcpy(&cpu->r->a, em_to_os(cpu, cpu->r->hl), 1);
             cpu->r->hl++;
             return;
-        case 3:
-            memcpy(em_to_os(cpu, nexttwob(cpu)), &cpu->r->a, 1);
+        case 3: // Differs on GB
+            memcpy(&cpu->r->a, em_to_os(cpu, cpu->r->hl), 1);
+            cpu->r->hl--;
             return;
         default:
             report_unknown(cpu);
@@ -353,8 +363,9 @@ void decode_0_2(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
         case 1:
             memcpy(&cpu->r->a, em_to_os(cpu, cpu->r->de), 1);
             return;
-        case 2:
-            memcpy(&cpu->r->hl, em_to_os(cpu, nexttwob(cpu)), 2);
+        case 2: // Differs on GB
+            memcpy(&cpu->r->a, em_to_os(cpu, cpu->r->hl), 1);
+            cpu->r->hl++;
             return;
         case 3:
             memcpy(&cpu->r->a, em_to_os(cpu, nexttwob(cpu)), 1);
@@ -444,13 +455,17 @@ void decode_0_7(struct Z80CPU *cpu, uint8_t op_y) {
 }
 
 // DONE
+// Wish there was a better way to handle referencing HL
 void decode_1_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
-    *cpu->r_table[op_y] = *cpu->r_table[op_z];
+    uint8_t *source = op_z == 6 ? em_to_os(cpu, cpu->r->hl) : cpu->r_table[op_z];
+    uint8_t *target = op_z == 6 ? em_to_os(cpu, cpu->r->hl) : cpu->r_table[op_y];
+    *target = *source;
 }
 
 // DONE
 void decode_2_n(struct Z80CPU *cpu, uint8_t op_y, uint8_t op_z) {
-    cpu->alu_table[op_y](cpu, *(cpu->r_table[op_z]));
+    uint8_t *operand = op_z == 6 ? em_to_os(cpu, cpu->r->hl) : cpu->r_table[op_z];
+    cpu->alu_table[op_y](cpu, *operand);
 }
 
 // Z80 <-> GB differ
@@ -486,8 +501,12 @@ void decode_3_1(struct Z80CPU *cpu, uint8_t op_q, uint8_t op_p) {
 }
 
 // Z80 <-> GB differ
-void decode_3_2(struct Z80CPU *cpu) {
-    memcpy(&cpu->r->a, em_to_os(cpu, nexttwob(cpu)), 1);
+void decode_3_2(struct Z80CPU *cpu, uint8_t op) {
+    if (op == 0xE2) {
+        *em_to_os(cpu, cpu->r->c) = cpu->r->a;
+    } else {
+        memcpy(&cpu->r->a, em_to_os(cpu, nexttwob(cpu)), 1);
+    }
 }
 
 // DONE
@@ -638,7 +657,7 @@ int execute(struct Z80CPU *cpu) {
                     decode_3_1(cpu, op_q, op_p);
                     break;
                 case 2:
-                    decode_3_2(cpu);
+                    decode_3_2(cpu, op);
                     break;
                 case 3:
                     decode_3_3(cpu, op_y);
