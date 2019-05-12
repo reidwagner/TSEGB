@@ -25,3 +25,11 @@ The [zasm](https://k1.spdns.de/Develop/Projects/zasm/Distributions/) assembler c
 Resources:
 - http://sgate.emt.bme.hu/patai/publications/z80guide/
 - http://www.z80.info/
+
+### WebAssembly
+
+First need to source emsdk_env.sh.
+
+To compile main as webasm:
+emcc src/main.c -Os -s WASM=1 -s SIDE_MODULE=1 -s EXPORTED_FUNCTIONS=["_main_wasm"] -o tse.wasm
+

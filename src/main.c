@@ -4,6 +4,13 @@
 #include <unistd.h>
 #include "cpu.h"
 #include "process.h"
+#include "fib.h"
+
+extern void printPixel(int x, int y);
+
+int squarer(int num) {
+    return num * num;
+}
 
 int main(int argc, char *argv[]) {
     int opt;
@@ -42,4 +49,17 @@ int main(int argc, char *argv[]) {
 usage_error:
         fprintf(stderr, "Usage ./tse <romfile>\n");
         exit(1);
+}
+
+int main_wasm(int arg) {
+    volatile uint8_t *foo = malloc(4);
+    foo[2] = 0x12;
+
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 20; j++) {
+            printPixel(i,j);
+        }
+    }
+
+    return (int)foo[2];
 }
