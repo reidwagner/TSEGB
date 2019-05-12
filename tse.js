@@ -38,6 +38,7 @@ function loadWebAssembly(filename, imports) {
             imports.env._fwrite = function () {};
             imports.env._getopt = function () {};
             imports.env._malloc = function () {};
+            imports.env._memcpy = function () {};
             imports.env._printf = function () {};
             imports.env._putchar = function () {};
             imports.env._puts = function () {};
@@ -45,9 +46,28 @@ function loadWebAssembly(filename, imports) {
             imports.env._strtol = function () {};
             imports.env.g$_optarg = function () {};
             imports.env.g$_optind = function () {};
-            imports.env._printPixel = function print_pixel(x,y) {
-                ctx.fillStyle = 'red';
+
+            imports.env._printpixel = function print_pixel(x, y, color) {
+                const colorString = (function(c) {
+                    switch (c) {
+                        case 0:
+                            return 'white';
+                        case 1:
+                            return 'lightgrey';
+                        case 2:
+                            return 'darkgrey';
+                        case 3:
+                            return 'black';
+                        default:
+                            return 'red';
+                    }
+                }(color));
+                ctx.fillStyle = colorString;
                 ctx.fillRect(x, y, 1, 1);
+            }
+
+            imports.env._loghex = function (num) {
+                console.log(("0000" + (+num).toString(16)).substr(-4));
             }
 
             if (!imports.env.memory) {
@@ -72,8 +92,7 @@ loadWebAssembly('tse.wasm')
         var button = document.getElementById('run');
         button.value = 'Call a method in the WebAssembly module';
         button.addEventListener('click', function() {
-            var input = 21;
-            alert(input + ' doubled is ' + exports._main_wasm());
+            exports._main_wasm();
         }, false);
     }
     );

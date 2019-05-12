@@ -27,9 +27,7 @@ uint8_t check_condition_nz(struct Z80CPU *cpu);
 void report_unknown(struct Z80CPU *cpu);
 void decode_op(uint8_t op, uint8_t *op_x, uint8_t *op_y, uint8_t *op_z, uint8_t *op_p, uint8_t *op_q);
 
-struct Z80CPU *newcpu() {
-    struct Z80CPU *cpu = malloc(sizeof(struct Z80CPU));
-    struct Z80CPU_REG *r = malloc(sizeof(struct Z80CPU_REG));
+void initcpu(struct Z80CPU *cpu, struct Z80CPU_REG *r) {
     cpu->r = r;
 
     r->a = 0;
@@ -99,7 +97,12 @@ struct Z80CPU *newcpu() {
     cpu->rot_table[ROT_SRL] = &srl;
 
     cpu->interrupts_enabled = true;
+}
 
+struct Z80CPU *newcpu() {
+    struct Z80CPU *cpu = malloc(sizeof(struct Z80CPU));
+    struct Z80CPU_REG *r = malloc(sizeof(struct Z80CPU_REG));
+    initcpu(cpu, r);
     return cpu;
 }
 
@@ -200,7 +203,8 @@ void stack_dump(struct Z80CPU *cpu, uint32_t length) {
     uint8_t *tmp_sp = em_to_os(cpu, cpu->r->sp + length);
     printf("[ Stack dump ]\n");
     for (size_t i = 0; i < length; i++) {
-        printf("%x: %x\n", tmp_sp, *tmp_sp);
+        // TODO: Why warning without cast?
+        printf("%x: %x\n", (unsigned int)tmp_sp, *tmp_sp);
         tmp_sp--;
     }
 }

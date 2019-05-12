@@ -33,3 +33,7 @@ First need to source emsdk_env.sh.
 To compile main as webasm:
 emcc src/main.c -Os -s WASM=1 -s SIDE_MODULE=1 -s EXPORTED_FUNCTIONS=["_main_wasm"] -o tse.wasm
 
+emcc src/main.c -Os -s WASM=1 -s SIDE_MODULE=1 -s EXPORTED_FUNCTIONS=["_main_wasm"] -o tse.wasm
+
+To look into:
+- How do libc functions work?

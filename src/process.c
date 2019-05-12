@@ -4,6 +4,7 @@
 #include <string.h>
 #include "process.h"
 #include "cpu.h"
+#include "video.h"
 
 bool verbose = false;
 
@@ -11,17 +12,20 @@ bool verbose = false;
 /*----                  Setup functions                      ---*/
 /*--------------------------------------------------------------*/
 
-struct Process *newprocess(size_t memsize) {
+struct Process *newprocess(void) {
     struct Process *p = malloc(sizeof(struct Process));
-    p->cpu = newcpu();
-    p->mem = malloc(memsize*sizeof(uint8_t));
+    initprocess(p, newcpu(), malloc(MEM_MAP_SIZE));
+    return p;
+}
+
+void initprocess(struct Process *p, struct Z80CPU *cpu, uint8_t *mem) {
+    p->cpu = cpu;
+    p->mem = mem;
     p->cpu->mem = p->mem;
     p->cpu->r->sp = MEM_RAM_INTERNAL_ECHO;
-    p->memsize = memsize;
+    p->memsize = MEM_MAP_SIZE;
     p->max_iterations = DEFAULT_MAX_ITERATIONS;
     p->iterations = 0;
-
-    return p;
 }
 
 void loadmemory(struct Process *p, FILE *romfp) {
@@ -79,10 +83,12 @@ int stepn(struct Process *p, int n) {
 
 
 int step(struct Process *p) {
-//    if (p->iterations++ >= p->max_iterations)
-//        return -1;
+    if (p->iterations++ >= p->max_iterations)
+        return -1;
 //    if (verbose)
 //        registerdump(p->cpu);
     execute(p->cpu);
+    loghex(p->cpu->r->a);
+    return 1;
 }
 

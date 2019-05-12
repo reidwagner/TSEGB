@@ -32,7 +32,8 @@ struct Process {
     int max_iterations;
 };
 
-struct Process *newprocess(size_t memsize);
+struct Process *newprocess(void);
+void initprocess(struct Process *p, struct Z80CPU *cpu, uint8_t *mem);
 void run(struct Process *p);
 void memorydump(struct Process *p);
 void dump(struct Process *p);

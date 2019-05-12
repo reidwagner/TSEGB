@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 #include "cpu.h"
 #include "process.h"
 #include "fib.h"
-
-extern void printPixel(int x, int y);
-
-int squarer(int num) {
-    return num * num;
-}
+#include "video.h"
 
 int main(int argc, char *argv[]) {
     int opt;
@@ -34,7 +30,7 @@ int main(int argc, char *argv[]) {
         }
     }
     char *romfilename = argv[optind];
-    struct Process *p = newprocess(MEM_MAP_SIZE + 1);
+    struct Process *p = newprocess();
     if (max_iterations)
         p->max_iterations = max_iterations;
     if (entry)
@@ -51,15 +47,26 @@ usage_error:
         exit(1);
 }
 
-int main_wasm(int arg) {
+void tse_memcpy(uint8_t *target, uint8_t *source, size_t len ) {
+    for (size_t i = 0; i < len; i++) {
+        target[i] = source[i];
+    }
+}
+
+void main_wasm(void) {
     volatile uint8_t *foo = malloc(4);
     foo[2] = 0x12;
 
-    for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < 20; j++) {
-            printPixel(i,j);
-        }
-    }
+    struct Z80CPU cpu;
+    struct Z80CPU_REG r;
+    uint8_t mem[MEM_MAP_SIZE];
+    struct Process process;
 
-    return (int)foo[2];
+    initcpu(&cpu, &r);
+    initprocess(&process, &cpu, mem);
+    process.max_iterations = 50;
+
+    tse_memcpy(process.mem, assembly_FIB_rom, assembly_FIB_rom_len); // len is getting corrupted somehow.
+
+    run(&process);
 }

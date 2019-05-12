@@ -1,6 +1,6 @@
 .org 0
 
-    ld b, 7
+    ld b, 12
     ld a, 1
     ld c, 0
 loop:

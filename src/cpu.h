@@ -125,6 +125,7 @@ struct Z80CPU {
 void registerdump(struct Z80CPU *cpu);
 
 struct Z80CPU *newcpu();
+void initcpu(struct Z80CPU *cpu, struct Z80CPU_REG *regs);
 
 int execute(struct Z80CPU *cpu);
 
